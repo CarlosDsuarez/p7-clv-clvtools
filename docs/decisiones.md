@@ -24,3 +24,11 @@ Fuente única: `R/00_utils.R`. No se modifican respecto a la especificación.
 - `print(clvdata)`: 2,357 clientes, 6,696 transacciones. Estimación 1997-01-01 → 1997-10-01 (39 semanas). Holdout 1997-10-02 → 1998-06-30 (38.71429 semanas). Coincide con la spec.
 - Paquetes en `renv.lock`: CLVTools 0.12.1, data.table 1.18.6.1, ggplot2 4.0.4, lubridate 1.9.5, R 4.6.0. El binario de data.table avisa que se compiló con R 4.6.1; no se recompiló.
 - `plot(clv, which = "tracking")` avisó que ggplot2 4.0.4 recibió un numérico en `scale_x_date`. El PNG se escribió igual (`outputs/figures/01_tracking.png`, 82 KB). No se tocó la lógica del script.
+
+## 2026-11-17 — Corrida de `R/02_fit_models.R`
+
+Los tres modelos convergieron. Cifras de `outputs/tables/02_model_comparison.csv` (2,357 clientes). Coinciden con la referencia de la spec en la precisión que esa tabla publica.
+
+- BG/NBD: logLik −9602.861, AIC 19213.72, BIC 19236.78. Gana por AIC.
+- Pareto/NBD: logLik −9615.242, AIC 19238.48, BIC 19261.54. Coeficientes: r 0.551, alpha 10.555, s 0.625, beta 12.244.
+- GGom/NBD: en la tabla impresa el logLik es el mismo que Pareto/NBD (−9615.242). En el CSV difieren en 1.3e-4 (−9615.24164 frente a −9615.24152). AIC 19240.48 solo sube por el parámetro extra. `coef()`: b = 1.92e-05, beta = 2.34e-04; r y alpha coinciden con Pareto/NBD. No es un modelo distinto: es el Pareto/NBD en el límite. No se cambió ningún parámetro.
