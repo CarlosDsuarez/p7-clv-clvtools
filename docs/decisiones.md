@@ -217,3 +217,11 @@ Hipótesis escrita antes de mirar el error: con una sola ocasión en la estimaci
 - La hipótesis no se sostiene, y el sentido es el contrario en el tramo de una compra. Ahí la tasa predice 0 y gana el MAE: CDNOW 0.237 frente a 0.334 del Pareto/NBD (1,411 clientes); Online Retail 0.706 frente a 0.853 (388 clientes). El modelo les pone a todos una expectativa positiva y la mayoría no vuelve.
 - Con 6 o más, la tasa se pasa. CDNOW: predice 9.28 donde se observan 4.77 (MAE 5.79 frente a 3.26 del BG/NBD, 132 clientes). Online Retail: predice 10.73 donde se observan 8.99 (MAE 4.22 frente a 3.97, 408 clientes).
 - El agregado de CDNOW lo deciden esos repetidores, aunque sean pocos. En el minorista el exceso de la tasa es chico y los tramos de una a cinco compras, donde la tasa no pierde, son la mayoría (1,321 de 1,729). Por eso allí el MAE total casi empata.
+
+## 2026-11-17 — Denominador de la tasa (`R/18_short_age.R`)
+
+Hipótesis escrita antes de mirar el error: en el tramo de 6 o más, el exceso de `(n-1)/edad` está en la segunda mitad de las 39 semanas (`first_wk >= 19.5`), y dividir siempre entre 39 acerca ese MAE al BG/NBD. En la primera mitad las dos tasas debían parecerse. Mismos datos que la fase 17. No entra en `run_all.R` ni en `targets`.
+
+- El tramo tardío tiene 0 clientes en los dos datasets. Los 132 de CDNOW y los 408 del minorista empezaron todos en la primera mitad. La hipótesis no se puede sostener: no hay denominadores de unas pocas semanas en ese tramo.
+- CDNOW, primera mitad (`18_short_age.csv`): la tasa individual predice 9.28 (MAE 5.79), la tasa sobre 39 semanas predice 7.92 (MAE 4.97), el BG/NBD predice 4.50 (MAE 3.26), lo observado es 4.77. Alargar el denominador cierra una parte y deja la mayor parte del exceso.
+- Online Retail, misma celda: tasa individual 10.73 (MAE 4.22), tasa sobre 39 semanas 10.17 (MAE 3.96), BG/NBD 9.38 (MAE 3.97), observado 8.99. Ahí el denominador fijo ya empata al modelo.

@@ -52,6 +52,7 @@ seas <- tab("14_seasonality_mae.csv")
 rank_s <- tab("15_ranking.csv")
 hold_rank <- tab("16_holdout_rank.csv")
 freq_mae <- tab("17_mae_by_frequency.csv")
+age_mae <- tab("18_short_age.csv")
 rec <- tab("07_parameter_recovery.csv")
 cov <- tab("06_covariates_comparison.csv")
 clv <- tab("04_clv_pnbd_52w.csv")
@@ -407,6 +408,26 @@ kable(fr[, .(dataset, bin, model, n_customers, mean_actual, mean_pred, MAE)],
 
 La hipótesis sale al revés en los dos negocios. Con una sola compra, predecir cero gana: en CDNOW el MAE es `r sprintf("%.3f", freq_mae[dataset == "cdnow" & bin == "1" & model == "naive_rate", MAE])` para la tasa y `r sprintf("%.3f", freq_mae[dataset == "cdnow" & bin == "1" & model == "pnbd", MAE])` para el Pareto/NBD; en Online Retail, `r sprintf("%.3f", freq_mae[dataset == "online_retail_ii" & bin == "1" & model == "naive_rate", MAE])` y `r sprintf("%.3f", freq_mae[dataset == "online_retail_ii" & bin == "1" & model == "pnbd", MAE])`. El modelo les asigna a todos una compra futura pequeña, y la mayoría no vuelve. Con seis o más compras la tasa se dispara (en CDNOW predice `r sprintf("%.2f", freq_mae[dataset == "cdnow" & bin == "6+" & model == "naive_rate", mean_pred])` donde se observan `r sprintf("%.2f", freq_mae[dataset == "cdnow" & bin == "6+" & model == "naive_rate", mean_actual])`) y ahí los BTYD bajan el error. En el minorista ese exceso es menor, por eso el agregado casi empata.
 
+## Denominador corto
+
+La hipótesis era que el exceso de la tasa, en el tramo de seis o más compras, estaba en quienes hicieron la primera compra en la segunda mitad de las 39 semanas, y que usar siempre 39 como denominador acercaba ese MAE al BG/NBD. En la primera mitad, las dos tasas debían parecerse.
+
+Ese tramo tardío no existe. Los 132 clientes de CDNOW y los 408 del minorista con seis o más compras empezaron todos en la primera mitad. No hay a quién echarle la culpa de un denominador de unas pocas semanas.
+
+```{r}
+#| echo: false
+ag <- copy(age_mae[cell == "6+_early"])
+ag[, MAE := round(MAE, 3)]
+ag[, mean_pred := round(mean_pred, 2)]
+ag[, mean_actual := round(mean_actual, 2)]
+kable(ag[, .(dataset, model, n_customers, mean_actual, mean_pred, MAE)],
+      caption = "Seis o más compras, primera mitad de la ventana. naive_calendar divide entre 39 semanas.")
+```
+
+![Tasa individual, tasa sobre 39 semanas y BTYD.](../outputs/figures/18_short_age.png)
+
+En CDNOW, alargar el denominador baja el pronóstico de `r sprintf("%.2f", age_mae[dataset == "cdnow" & cell == "6+_early" & model == "naive_rate", mean_pred])` a `r sprintf("%.2f", age_mae[dataset == "cdnow" & cell == "6+_early" & model == "naive_calendar", mean_pred])`, frente a `r sprintf("%.2f", age_mae[dataset == "cdnow" & cell == "6+_early" & model == "naive_rate", mean_actual])` observado y `r sprintf("%.2f", age_mae[dataset == "cdnow" & cell == "6+_early" & model == "bgnbd", mean_pred])` del BG/NBD. Cierra una parte y deja el MAE en `r sprintf("%.2f", age_mae[dataset == "cdnow" & cell == "6+_early" & model == "naive_calendar", MAE])`, lejos del `r sprintf("%.2f", age_mae[dataset == "cdnow" & cell == "6+_early" & model == "bgnbd", MAE])` del modelo. En el minorista las tres cifras ya estaban juntas: la tasa sobre 39 semanas tiene MAE `r sprintf("%.3f", age_mae[dataset == "online_retail_ii" & cell == "6+_early" & model == "naive_calendar", MAE])` y el BG/NBD `r sprintf("%.3f", age_mae[dataset == "online_retail_ii" & cell == "6+_early" & model == "bgnbd", MAE])`. El exceso que queda en CDNOW no es un denominador corto.
+
 ## Limitaciones
 
 - El contexto es sin contrato. Este marco no vale para suscripciones ni para préstamos, donde el abandono sí se observa.
@@ -437,6 +458,7 @@ Rscript R/14_seasonality.R
 Rscript R/15_ranking.R
 Rscript R/16_holdout_rank.R
 Rscript R/17_frequency_strata.R
+Rscript R/18_short_age.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'

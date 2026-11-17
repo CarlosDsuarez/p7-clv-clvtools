@@ -21,6 +21,7 @@ Rscript R/14_seasonality.R
 Rscript R/15_ranking.R
 Rscript R/16_holdout_rank.R
 Rscript R/17_frequency_strata.R
+Rscript R/18_short_age.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
@@ -48,6 +49,8 @@ Online Retail II no está en el repositorio. El script `R/10_online_retail.R` es
 `R/16_holdout_rank.R` repite esa pregunta en el holdout de 39 semanas. Tampoco. El Spearman es 0.655 para la tasa y 0.655 para el BG/NBD. El decil superior del pronóstico concentra el 38.2% de las compras futuras con la tasa y el 38.3% con el BG/NBD.
 
 `R/17_frequency_strata.R` parte el holdout según las compras previas al corte. Con una sola compra, predecir cero gana en los dos datasets. Con seis o más, la tasa se pasa de largo, y el exceso es grande en CDNOW (predice 9.28 donde se observan 4.77) y chico en el minorista (10.73 frente a 8.99). Por eso el agregado de CDNOW premia al modelo y el de Online Retail casi empata.
+
+`R/18_short_age.R` pregunta si ese exceso es de quien empezó tarde y tiene un denominador corto. No: nadie con seis o más compras empezó en la segunda mitad de las 39 semanas. Dividir siempre entre 39 baja el pronóstico de CDNOW de 9.28 a 7.92, y lo observado es 4.77. El BG/NBD queda en 4.50. El denominador explica una parte, no el exceso.
 
 ## Resultados
 
