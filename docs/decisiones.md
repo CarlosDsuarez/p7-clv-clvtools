@@ -225,3 +225,11 @@ Hipótesis escrita antes de mirar el error: en el tramo de 6 o más, el exceso d
 - El tramo tardío tiene 0 clientes en los dos datasets. Los 132 de CDNOW y los 408 del minorista empezaron todos en la primera mitad. La hipótesis no se puede sostener: no hay denominadores de unas pocas semanas en ese tramo.
 - CDNOW, primera mitad (`18_short_age.csv`): la tasa individual predice 9.28 (MAE 5.79), la tasa sobre 39 semanas predice 7.92 (MAE 4.97), el BG/NBD predice 4.50 (MAE 3.26), lo observado es 4.77. Alargar el denominador cierra una parte y deja la mayor parte del exceso.
 - Online Retail, misma celda: tasa individual 10.73 (MAE 4.22), tasa sobre 39 semanas 10.17 (MAE 3.96), BG/NBD 9.38 (MAE 3.97), observado 8.99. Ahí el denominador fijo ya empata al modelo.
+
+## 2026-11-17 — Última compra (`R/19_recency_gap.R`)
+
+Hipótesis escrita antes de mirar el error: el exceso que queda al dividir entre 39 semanas, en el tramo de 6 o más, está en quienes no compran desde la primera mitad (`last_wk < 19.5`). Ahí el BG/NBD baja el MAE de esa tasa. Quienes compran en la segunda mitad siguen activos y ahí la tasa empata o gana. Mismos datos que la fase 18. No entra en `run_all.R` ni en `targets`. Las dos celdas suman los 132 y los 408 del tramo anterior.
+
+- La hipótesis no se sostiene en CDNOW (`19_recency_gap.csv`). La celda quieta tiene 8 clientes (última compra en la semana 13.3, P(activo) del BG/NBD 0.05). La tasa sobre 39 semanas predice 7.47 y se observan 1.50; el BG/NBD baja a 0.23.
+- Los otros 124 compraron en la segunda mitad (semana 33.6) y la P(activo) es 0.72. La tasa predice 7.95 donde se observan 4.98 (MAE 4.90). El BG/NBD predice 4.77 (MAE 3.38). El exceso de la fase 18 sigue en clientes a los que el modelo da por activos.
+- Online Retail: 403 de 408 están en la segunda mitad, con P(activo) 0.996. El MAE de la tasa sobre 39 semanas es 3.95 y el del BG/NBD 3.98. Los 5 quietos no mueven el tramo.

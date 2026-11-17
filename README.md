@@ -22,6 +22,7 @@ Rscript R/15_ranking.R
 Rscript R/16_holdout_rank.R
 Rscript R/17_frequency_strata.R
 Rscript R/18_short_age.R
+Rscript R/19_recency_gap.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
@@ -51,6 +52,8 @@ Online Retail II no está en el repositorio. El script `R/10_online_retail.R` es
 `R/17_frequency_strata.R` parte el holdout según las compras previas al corte. Con una sola compra, predecir cero gana en los dos datasets. Con seis o más, la tasa se pasa de largo, y el exceso es grande en CDNOW (predice 9.28 donde se observan 4.77) y chico en el minorista (10.73 frente a 8.99). Por eso el agregado de CDNOW premia al modelo y el de Online Retail casi empata.
 
 `R/18_short_age.R` pregunta si ese exceso es de quien empezó tarde y tiene un denominador corto. No: nadie con seis o más compras empezó en la segunda mitad de las 39 semanas. Dividir siempre entre 39 baja el pronóstico de CDNOW de 9.28 a 7.92, y lo observado es 4.77. El BG/NBD queda en 4.50. El denominador explica una parte, no el exceso.
+
+`R/19_recency_gap.R` pregunta si lo que queda es de quien lleva semanas sin comprar. En CDNOW son 8 de 132. Los otros 124 compraron en la segunda mitad (última compra en la semana 33.6) y el BG/NBD les da P(activo) 0.72. La tasa sobre 39 semanas sigue en 7.95 frente a 4.98 observado; el BG/NBD queda en 4.77. En el minorista, 403 de 408 siguen activos (P(activo) 0.996) y las dos cifras empatan (MAE 3.95 y 3.98).
 
 ## Resultados
 

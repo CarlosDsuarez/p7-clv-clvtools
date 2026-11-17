@@ -53,6 +53,7 @@ rank_s <- tab("15_ranking.csv")
 hold_rank <- tab("16_holdout_rank.csv")
 freq_mae <- tab("17_mae_by_frequency.csv")
 age_mae <- tab("18_short_age.csv")
+gap_mae <- tab("19_recency_gap.csv")
 rec <- tab("07_parameter_recovery.csv")
 cov <- tab("06_covariates_comparison.csv")
 clv <- tab("04_clv_pnbd_52w.csv")
@@ -428,6 +429,30 @@ kable(ag[, .(dataset, model, n_customers, mean_actual, mean_pred, MAE)],
 
 En CDNOW, alargar el denominador baja el pronóstico de `r sprintf("%.2f", age_mae[dataset == "cdnow" & cell == "6+_early" & model == "naive_rate", mean_pred])` a `r sprintf("%.2f", age_mae[dataset == "cdnow" & cell == "6+_early" & model == "naive_calendar", mean_pred])`, frente a `r sprintf("%.2f", age_mae[dataset == "cdnow" & cell == "6+_early" & model == "naive_rate", mean_actual])` observado y `r sprintf("%.2f", age_mae[dataset == "cdnow" & cell == "6+_early" & model == "bgnbd", mean_pred])` del BG/NBD. Cierra una parte y deja el MAE en `r sprintf("%.2f", age_mae[dataset == "cdnow" & cell == "6+_early" & model == "naive_calendar", MAE])`, lejos del `r sprintf("%.2f", age_mae[dataset == "cdnow" & cell == "6+_early" & model == "bgnbd", MAE])` del modelo. En el minorista las tres cifras ya estaban juntas: la tasa sobre 39 semanas tiene MAE `r sprintf("%.3f", age_mae[dataset == "online_retail_ii" & cell == "6+_early" & model == "naive_calendar", MAE])` y el BG/NBD `r sprintf("%.3f", age_mae[dataset == "online_retail_ii" & cell == "6+_early" & model == "bgnbd", MAE])`. El exceso que queda en CDNOW no es un denominador corto.
 
+## Última compra
+
+La hipótesis, fijada antes de mirar el error, era que ese exceso está en quienes tienen seis o más compras y no vuelven a comprar desde la primera mitad de las 39 semanas. Ahí el BG/NBD debía bajar el MAE de la tasa sobre 39 semanas. Quienes compran en la segunda mitad siguen activos, y ahí esa tasa debía empatar o ganar.
+
+```{r}
+#| echo: false
+gp <- copy(gap_mae)
+gp[, MAE := round(MAE, 3)]
+gp[, mean_pred := round(mean_pred, 2)]
+gp[, mean_actual := round(mean_actual, 2)]
+gp[, mean_last_wk := round(mean_last_wk, 1)]
+gp[, mean_palive := round(mean_palive, 3)]
+kable(gp[, .(dataset, cell, model, n_customers, mean_last_wk, mean_actual, mean_pred, MAE, mean_palive)],
+      caption = "Seis o más compras. silent: última compra antes de la semana 19.5. recent: desde esa semana. naive_calendar divide entre 39.")
+```
+
+![Seis o más compras, según la última compra.](../outputs/figures/19_recency_gap.png)
+
+En CDNOW la hipótesis no se sostiene. La segunda mitad es `r gap_mae[dataset == "cdnow" & cell == "6+_recent" & model == "bgnbd", n_customers]` de los `r gap_mae[dataset == "cdnow" & cell == "6+_recent" & model == "bgnbd", n_customers] + gap_mae[dataset == "cdnow" & cell == "6+_silent" & model == "bgnbd", n_customers]` clientes. Su última compra cae en la semana `r sprintf("%.1f", gap_mae[dataset == "cdnow" & cell == "6+_recent" & model == "bgnbd", mean_last_wk])` y la P(activo) del BG/NBD es `r sprintf("%.2f", gap_mae[dataset == "cdnow" & cell == "6+_recent" & model == "bgnbd", mean_palive])`. La tasa sobre 39 semanas predice `r sprintf("%.2f", gap_mae[dataset == "cdnow" & cell == "6+_recent" & model == "naive_calendar", mean_pred])` donde se observan `r sprintf("%.2f", gap_mae[dataset == "cdnow" & cell == "6+_recent" & model == "naive_calendar", mean_actual])` (MAE `r sprintf("%.2f", gap_mae[dataset == "cdnow" & cell == "6+_recent" & model == "naive_calendar", MAE])`). El BG/NBD predice `r sprintf("%.2f", gap_mae[dataset == "cdnow" & cell == "6+_recent" & model == "bgnbd", mean_pred])` (MAE `r sprintf("%.2f", gap_mae[dataset == "cdnow" & cell == "6+_recent" & model == "bgnbd", MAE])`). El exceso sigue en clientes a los que el modelo da por activos.
+
+Los `r gap_mae[dataset == "cdnow" & cell == "6+_silent" & model == "bgnbd", n_customers]` restantes tienen la última compra en la semana `r sprintf("%.1f", gap_mae[dataset == "cdnow" & cell == "6+_silent" & model == "bgnbd", mean_last_wk])` y una P(activo) de `r sprintf("%.2f", gap_mae[dataset == "cdnow" & cell == "6+_silent" & model == "bgnbd", mean_palive])`. La tasa predice `r sprintf("%.2f", gap_mae[dataset == "cdnow" & cell == "6+_silent" & model == "naive_calendar", mean_pred])` y se observan `r sprintf("%.2f", gap_mae[dataset == "cdnow" & cell == "6+_silent" & model == "naive_calendar", mean_actual])`. El BG/NBD baja a `r sprintf("%.2f", gap_mae[dataset == "cdnow" & cell == "6+_silent" & model == "bgnbd", mean_pred])`. Es la celda que la hipótesis pedía, y no alcanza para el exceso del tramo.
+
+En el minorista, `r gap_mae[dataset == "online_retail_ii" & cell == "6+_recent" & model == "bgnbd", n_customers]` de `r gap_mae[dataset == "online_retail_ii" & cell == "6+_recent" & model == "bgnbd", n_customers] + gap_mae[dataset == "online_retail_ii" & cell == "6+_silent" & model == "bgnbd", n_customers]` siguen comprando en la segunda mitad, con P(activo) `r sprintf("%.3f", gap_mae[dataset == "online_retail_ii" & cell == "6+_recent" & model == "bgnbd", mean_palive])`. El MAE de la tasa sobre 39 semanas es `r sprintf("%.2f", gap_mae[dataset == "online_retail_ii" & cell == "6+_recent" & model == "naive_calendar", MAE])` y el del BG/NBD `r sprintf("%.2f", gap_mae[dataset == "online_retail_ii" & cell == "6+_recent" & model == "bgnbd", MAE])`. Ahí la tasa empata, en el dataset donde el tramo completo ya empataba.
+
 ## Limitaciones
 
 - El contexto es sin contrato. Este marco no vale para suscripciones ni para préstamos, donde el abandono sí se observa.
@@ -459,6 +484,7 @@ Rscript R/15_ranking.R
 Rscript R/16_holdout_rank.R
 Rscript R/17_frequency_strata.R
 Rscript R/18_short_age.R
+Rscript R/19_recency_gap.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
