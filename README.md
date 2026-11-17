@@ -20,6 +20,7 @@ Rscript R/13_identification.R
 Rscript R/14_seasonality.R
 Rscript R/15_ranking.R
 Rscript R/16_holdout_rank.R
+Rscript R/17_frequency_strata.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
@@ -45,6 +46,8 @@ Online Retail II no está en el repositorio. El script `R/10_online_retail.R` es
 `R/15_ranking.R` pregunta si, pese al empate en MAE, el modelo ordena mejor quién compra. No. En diciembre el Spearman es 0.451 para la tasa y 0.448 para el Pareto/NBD. En junio, 0.413 y 0.412. Entre repetidores la diferencia cabe en el tercer decimal.
 
 `R/16_holdout_rank.R` repite esa pregunta en el holdout de 39 semanas. Tampoco. El Spearman es 0.655 para la tasa y 0.655 para el BG/NBD. El decil superior del pronóstico concentra el 38.2% de las compras futuras con la tasa y el 38.3% con el BG/NBD.
+
+`R/17_frequency_strata.R` parte el holdout según las compras previas al corte. Con una sola compra, predecir cero gana en los dos datasets. Con seis o más, la tasa se pasa de largo, y el exceso es grande en CDNOW (predice 9.28 donde se observan 4.77) y chico en el minorista (10.73 frente a 8.99). Por eso el agregado de CDNOW premia al modelo y el de Online Retail casi empata.
 
 ## Resultados
 

@@ -209,3 +209,11 @@ Hipótesis escrita antes de mirar el resultado: en la cohorte y el holdout de `R
 - Decil superior: tasa 38.2% de las compras del holdout; los tres BTYD, 38.3%.
 - El MAE reproduce la fase 10: BG/NBD 2.026, tasa 2.041, mismos 1,729 clientes.
 - La hipótesis no se sostiene. En este corte el modelo no ordena mejor a los clientes ni concentra mejor las compras futuras. La ventaja de MAE, de menos de un 1%, no viene de un mejor ranking.
+
+## 2026-11-17 — MAE por frecuencia (`R/17_frequency_strata.R`)
+
+Hipótesis escrita antes de mirar el error: con una sola ocasión en la estimación, Pareto/NBD y BG/NBD tienen menor MAE que la tasa; con 6 o más, la tasa empata o gana. Tramos fijados: 1, 2, 3-5, 6+. Mismo `EST_SPLIT_WEEKS = 39` en CDNOW y en la cohorte de Online Retail. No entra en `run_all.R` ni en `targets`.
+
+- La hipótesis no se sostiene, y el sentido es el contrario en el tramo de una compra. Ahí la tasa predice 0 y gana el MAE: CDNOW 0.237 frente a 0.334 del Pareto/NBD (1,411 clientes); Online Retail 0.706 frente a 0.853 (388 clientes). El modelo les pone a todos una expectativa positiva y la mayoría no vuelve.
+- Con 6 o más, la tasa se pasa. CDNOW: predice 9.28 donde se observan 4.77 (MAE 5.79 frente a 3.26 del BG/NBD, 132 clientes). Online Retail: predice 10.73 donde se observan 8.99 (MAE 4.22 frente a 3.97, 408 clientes).
+- El agregado de CDNOW lo deciden esos repetidores, aunque sean pocos. En el minorista el exceso de la tasa es chico y los tramos de una a cinco compras, donde la tasa no pierde, son la mayoría (1,321 de 1,729). Por eso allí el MAE total casi empata.
