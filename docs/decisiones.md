@@ -56,3 +56,17 @@ Gamma/Gamma convergió (KKT 1 y 2 verdaderos). LL −4055.80, AIC 8117.59, BIC 8
 - Gasto esperado del período (`04_sensitivity_horizon.csv`, `predicted.period.spending`): 13 sem → 22,654; 26 → 42,309; 52 → 75,713; 104 → 128,544.
 
 La sensibilidad al horizonte no usa `predicted.CLV`: esa columna es DERT por gasto medio, con horizonte infinito, y solo se mueve con el descuento. El descuento es la tasa continua semanal `log(1.10)/52`. Cifras alineadas con la referencia.
+
+## 2026-11-17 — Corrida de `R/05_benchmark_xgboost.R`
+
+xgboost 3.2.1.1, los mismos hiperparámetros de la spec (`count:poisson`, eta 0.05, max_depth 3, 150 rondas, semilla 42). El `stopifnot` de fuga temporal no se disparó. Los BTYD se comparan sobre los 2,357 clientes del holdout: su MAE reproduce la fase 3 al decimal que imprime data.table.
+
+`outputs/tables/05_benchmark.csv`:
+
+- Pareto/NBD: MAE 0.751, RMSE 1.597, sesgo −0.099.
+- GGom/NBD: MAE 0.751, RMSE 1.597, sesgo −0.099.
+- BG/NBD: MAE 0.782, RMSE 1.602, sesgo −0.101.
+- XGBoost: MAE 0.908, RMSE 1.677, sesgo +0.002.
+- Baseline: MAE 1.018, RMSE 2.199, sesgo +0.439.
+
+La referencia de la spec trae XGBoost en MAE 0.915, RMSE 1.684 y sesgo +0.012. La diferencia es pequeña y no cambia el orden: XGBoost mejora al baseline (~11% de MAE) y queda ~21% peor que el Pareto/NBD, con sesgo casi nulo. No se retocaron hiperparámetros. La causa plausible es el binario (R 4.6.0 en macOS arm64 frente a R 4.3.3 en Ubuntu). Las ventanas de entrenamiento y test siguen sin el mismo largo (19 frente a ~39 semanas), normalizadas a tasas.
