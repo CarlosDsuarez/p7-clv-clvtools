@@ -70,3 +70,13 @@ xgboost 3.2.1.1, los mismos hiperparámetros de la spec (`count:poisson`, eta 0.
 - Baseline: MAE 1.018, RMSE 2.199, sesgo +0.439.
 
 La referencia de la spec trae XGBoost en MAE 0.915, RMSE 1.684 y sesgo +0.012. La diferencia es pequeña y no cambia el orden: XGBoost mejora al baseline (~11% de MAE) y queda ~21% peor que el Pareto/NBD, con sesgo casi nulo. No se retocaron hiperparámetros. La causa plausible es el binario (R 4.6.0 en macOS arm64 frente a R 4.3.3 en Ubuntu). Las ventanas de entrenamiento y test siguen sin el mismo largo (19 frente a ~39 semanas), normalizadas a tasas.
+
+## 2026-11-17 — Corrida de `R/06_covariates.R`
+
+`estimation.split = 104` semanas en apparel, como fija la spec (con 40 el Pareto/NBD base no converge). Los tres ajustes convergieron. `outputs/tables/06_covariates_comparison.csv`:
+
+- Dinámico: AIC 11525.87, holdout MAE 1.858.
+- Estático: AIC 11658.13, holdout MAE 2.007.
+- Base: AIC 11704.20, holdout MAE 2.040.
+
+Razón de verosimilitud estático contra base: Chi-cuadrado 54.07 con 4 grados de libertad, p = 5.087e-11. Los covariables de apparel son simulados: el p-valor solo confirma que el mecanismo de CLVTools responde, no un efecto de negocio. Solo el Pareto/NBD admite covariables dinámicas. Cifras alineadas con la referencia.
