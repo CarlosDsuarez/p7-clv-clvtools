@@ -172,3 +172,13 @@ La grilla se escribió antes de correrla: n = 500, 1,000, 2,000, 3,000 y 5,000; 
 - \(E[\lambda]\): mediana del error absoluto 7.9% (500), 4.5% (2,000), 3.8% (5,000).
 - \(E[\mu]\): 42.6% (500), 25.2% (2,000), 16.8% (3,000), 14.1% (5,000). A n = 2,000 el rango de las diez semillas es −45% a +47%, así que el +34.5% de la semilla 42 no es un caso aparte.
 - El +2% de la simulación de 3,000 con semilla 42 fue un sorteo favorable frente a estas diez semillas.
+
+## 2026-11-17 — Más muestra y correlación de s y beta (`R/13_identification.R`)
+
+Grilla fijada antes de correrla: las mismas semillas 1 a 10, los tamaños de la fase anterior, más 10,000 y 20,000. No se cambia `EST_SPLIT_WEEKS` ni la semilla 42. No entra en `run_all.R` ni en `targets`.
+
+- Los tamaños 500 a 5,000 reproducen `12_recovery_by_n_summary.csv`: la diferencia máxima de la mediana del error absoluto es 4.9e-16.
+- \(E[\mu]\), mediana del error absoluto: 14.1% con 5,000, 11.1% con 10,000, 4.9% con 20,000. El 14% no era un techo.
+- \(E[\lambda]\) con 20,000: 1.9%.
+- En el mismo n = 20,000, \(s\) queda en 8.0% y \(\beta\) en 11.8%. El cociente se estima mejor que cada parámetro.
+- Correlación entre semillas de las estimaciones de \(s\) y \(\beta\): 0.98 con 20,000 comercios, y entre 0.92 y 1.00 en todos los tamaños (`13_param_correlation.csv`). Se mueven juntos.

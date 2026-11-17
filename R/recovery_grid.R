@@ -11,3 +11,14 @@ summarize_recovery <- function(detail) {
     median_abs_rel_error = median(abs(rel_error))
   ), by = .(n, param)][order(param, n)]
 }
+
+cor_s_beta <- function(detail) {
+  stopifnot(all(c("n", "seed", "param", "estimate") %in% names(detail)))
+  wide <- dcast(
+    detail[param %in% c("s", "beta")],
+    n + seed ~ param,
+    value.var = "estimate"
+  )
+  wide <- wide[!is.na(s) & !is.na(beta)]
+  wide[, .(n_ok = .N, cor_s_beta = cor(s, beta)), by = n][order(n)]
+}

@@ -16,6 +16,7 @@ Rscript R/09_uncertainty.R
 Rscript R/10_online_retail.R
 Rscript R/11_bnpl_merchants.R
 Rscript R/12_recovery_by_n.R
+Rscript R/13_identification.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
@@ -33,6 +34,8 @@ Online Retail II no está en el repositorio. El script `R/10_online_retail.R` es
 `R/11_bnpl_merchants.R` genera 2,000 comercios sintéticos. No es el archivo de P13 ni un modelo de impago. `PAlive` es la probabilidad de seguir originando: por debajo de 0.5 el holdout trae 0.15 originaciones de media, y por encima 2.39. El Pareto/NBD baja el MAE de 0.913 a 0.716.
 
 `R/12_recovery_by_n.R` repite la recuperación en 10 semillas y cinco tamaños, de 500 a 5,000. La tasa de compra queda cerca del 4% de error mediano desde 2,000 comercios. La de abandono sigue en 14% con 5,000. El +34% de la semilla 42 con 2,000 comercios entra en ese rango.
+
+`R/13_identification.R` alarga esa grilla a 10,000 y 20,000. El 14% no era un techo: con 20,000 comercios el error mediano de la tasa de abandono baja a 4.9%. `s` y `beta` se mueven juntos (correlación 0.98) y cada uno se estima peor que el cociente.
 
 ## Resultados
 

@@ -14,3 +14,14 @@ test_that("el resumen ignora ajustes fallidos y agrupa por n y parámetro", {
   expect_equal(out[n == 100, mean_rel_error], 0.05)
   expect_equal(out[n == 500, median_abs_rel_error], 0.4)
 })
+
+test_that("s y beta perfectamente alineados dan correlación 1", {
+  detail <- data.table(
+    n = 10, seed = 1:4,
+    param = rep(c("s", "beta"), each = 4),
+    estimate = c(1:4, 2 * (1:4))
+  )
+  out <- cor_s_beta(detail)
+  expect_equal(out$n_ok, 4)
+  expect_equal(out$cor_s_beta, 1)
+})

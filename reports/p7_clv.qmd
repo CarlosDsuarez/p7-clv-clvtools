@@ -46,6 +46,8 @@ bnpl_m <- tab("11_holdout_metrics.csv")
 bnpl_p <- tab("11_palive_summary.csv")
 bnpl_r <- tab("11_parameter_recovery.csv")
 rec_n <- tab("12_recovery_by_n_summary.csv")
+rec_big <- tab("13_recovery_summary.csv")
+cor_sb <- tab("13_param_correlation.csv")
 rec <- tab("07_parameter_recovery.csv")
 cov <- tab("06_covariates_comparison.csv")
 clv <- tab("04_clv_pnbd_52w.csv")
@@ -313,6 +315,28 @@ kable(show_n[, .(n, param, n_ok, `mediana |error| %`)],
 
 \(E[\lambda]\) baja a un error mediano de `r sprintf("%.1f", 100 * rec_n[n == 2000 & param == "E[lambda]=r/alpha", median_abs_rel_error])`% con 2,000 comercios y se queda cerca de `r sprintf("%.1f", 100 * rec_n[n == 5000 & param == "E[lambda]=r/alpha", median_abs_rel_error])`% con 5,000. \(E[\mu]\) va de `r sprintf("%.0f", 100 * rec_n[n == 500 & param == "E[mu]=s/beta", median_abs_rel_error])`% a `r sprintf("%.0f", 100 * rec_n[n == 5000 & param == "E[mu]=s/beta", median_abs_rel_error])`%. Con 5,000 comercios el abandono sigue sin estar bien identificado. El +2% de la simulación de 3,000 con semilla 42 fue un sorteo favorable: en estas diez semillas el error mediano a 3,000 es `r sprintf("%.0f", 100 * rec_n[n == 3000 & param == "E[mu]=s/beta", median_abs_rel_error])`%.
 
+## El abandono pide más muestra
+
+La grilla anterior paraba en 5,000. Antes de volver a mirar el resultado se alargó a 10,000 y 20,000, con las mismas semillas 1 a 10. Los tamaños de 500 a 5,000 reproducen la mediana ya publicada (diferencia numérica de orden \(10^{-16}\)).
+
+```{r}
+#| echo: false
+big <- copy(rec_big[param %in% c("E[lambda]=r/alpha", "E[mu]=s/beta", "s", "beta") & n %in% c(5000, 20000)])
+big[, param := fcase(
+  param == "E[lambda]=r/alpha", "E[lambda]",
+  param == "E[mu]=s/beta", "E[mu]",
+  default = param
+)]
+big[, `mediana |error| %` := round(100 * median_abs_rel_error, 1)]
+kable(big[, .(n, param, n_ok, `mediana |error| %`)],
+      caption = "Error mediano en 5,000 y 20,000 comercios.")
+kable(cor_sb, digits = 3, caption = "Correlación, entre semillas, de las estimaciones de s y beta.")
+```
+
+![La tasa de abandono sigue bajando después de 5,000 comercios.](../outputs/figures/13_recovery_by_n.png)
+
+Con 20,000 comercios la mediana del error de \(E[\mu]\) es `r sprintf("%.1f", 100 * rec_big[n == 20000 & param == "E[mu]=s/beta", median_abs_rel_error])`%, y la de \(E[\lambda]\) es `r sprintf("%.1f", 100 * rec_big[n == 20000 & param == "E[lambda]=r/alpha", median_abs_rel_error])`%. No había un techo en 14%. \(s\) y \(\beta\) siguen peor identificados que su cociente (a 20,000, `r sprintf("%.1f", 100 * rec_big[n == 20000 & param == "s", median_abs_rel_error])`% y `r sprintf("%.1f", 100 * rec_big[n == 20000 & param == "beta", median_abs_rel_error])`%) y sus estimaciones se mueven juntas: la correlación entre semillas es `r sprintf("%.2f", cor_sb[n == 20000, cor_s_beta])`.
+
 ## Limitaciones
 
 - El contexto es sin contrato. Este marco no vale para suscripciones ni para préstamos, donde el abandono sí se observa.
@@ -338,6 +362,7 @@ Rscript R/09_uncertainty.R
 Rscript R/10_online_retail.R
 Rscript R/11_bnpl_merchants.R
 Rscript R/12_recovery_by_n.R
+Rscript R/13_identification.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
