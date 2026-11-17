@@ -95,3 +95,7 @@ Simulación de 3,000 clientes, semilla 42, parámetros verdaderos de la spec. `o
 s y beta se recuperan peor (débilmente identificados y correlacionados). Las medias implícitas son la comparación fiable. Cifras alineadas con la referencia.
 
 `Rscript R/run_all.R` con `outputs/` vacío terminó con código 0. Tiempos: 01 1.0 s, 02 0.8 s, 03 0.4 s, 04 0.2 s, 05 0.1 s, 06 43.4 s, 07 0.4 s. Las tablas ya versionadas no cambiaron al regenerarse. La biblioteca de renv ya estaba instalada; un `renv::restore()` desde cero queda para la comprobación de A1 en la fase 9.
+
+## 2026-11-17 — Tests locales
+
+`testthat::test_dir("tests/testthat", stop_on_failure = TRUE)`: FAIL 0, PASS 20, WARN 1. El aviso es el de data.table compilado con R 4.6.1, no un fallo de aserción. El `stopifnot` de fuga temporal del paso 5 sigue en el script; el test de `features_at` cubre el mismo corte. El workflow de CI es el de la spec, sin cambios, hasta ver la primera corrida en GitHub Actions.
