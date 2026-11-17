@@ -80,3 +80,18 @@ La referencia de la spec trae XGBoost en MAE 0.915, RMSE 1.684 y sesgo +0.012. L
 - Base: AIC 11704.20, holdout MAE 2.040.
 
 Razón de verosimilitud estático contra base: Chi-cuadrado 54.07 con 4 grados de libertad, p = 5.087e-11. Los covariables de apparel son simulados: el p-valor solo confirma que el mecanismo de CLVTools responde, no un efecto de negocio. Solo el Pareto/NBD admite covariables dinámicas. Cifras alineadas con la referencia.
+
+## 2026-11-17 — Corrida de `R/07_simulation_recovery.R` y `R/run_all.R`
+
+Simulación de 3,000 clientes, semilla 42, parámetros verdaderos de la spec. `outputs/tables/07_parameter_recovery.csv`:
+
+- r: 0.543 frente a 0.553 (−1.9%).
+- alpha: 10.264 frente a 10.578 (−3.0%).
+- s: 0.516 frente a 0.606 (−14.9%).
+- beta: 9.735 frente a 11.669 (−16.6%).
+- E[λ] = r/alpha: 0.0529 frente a 0.0523 (+1.1%).
+- E[μ] = s/beta: 0.0530 frente a 0.0519 (+2.0%).
+
+s y beta se recuperan peor (débilmente identificados y correlacionados). Las medias implícitas son la comparación fiable. Cifras alineadas con la referencia.
+
+`Rscript R/run_all.R` con `outputs/` vacío terminó con código 0. Tiempos: 01 1.0 s, 02 0.8 s, 03 0.4 s, 04 0.2 s, 05 0.1 s, 06 43.4 s, 07 0.4 s. Las tablas ya versionadas no cambiaron al regenerarse. La biblioteca de renv ya estaba instalada; un `renv::restore()` desde cero queda para la comprobación de A1 en la fase 9.
