@@ -135,3 +135,11 @@ Extensión de la sección 11. No se modificó la lógica de los scripts ni `EST_
 - `_targets/` no se versiona: es caché local. Los CSV y las figuras sí.
 - Primera `tar_make()`: 21 pasos, 5 min 57 s, 0 saltados. Los CSV no cambiaron respecto a la corrida anterior. Segunda `tar_make()`, sin tocar nada: 21 saltados, 44 ms.
 - Tres targets avisan lo ya conocido: data.table compilado con R 4.6.1 y `scale_x_date` en los gráficos de CLVTools. No se cambió el código por eso.
+
+## 2026-11-17 — Tablero Shiny (`shiny/app.R`)
+
+Extensión de la sección 11. No se reajustan modelos ni se cambia `EST_SPLIT_WEEKS`.
+
+- shiny 1.14.0 y DT 0.34.0. La app lee `04_clv_pnbd_52w.csv` y `09_clv_intervals.csv`. El CLV que muestra es el de horizonte infinito al 10%; el CET de esa tabla es a 52 semanas, no el holdout de 38.7.
+- Filtros: P(activo) mínima, CLV mínimo e Id. Sin filtro muestra 2,357 clientes y CLV 317,281 (100%). Con Id `509` quedan 2 clientes (509 y 1509) y CLV 5,306 (1.7%). Con P(activo) ≥ 0.95 quedan 137 clientes y CLV 103,924 (32.8%). Un Id inexistente deja la tabla vacía y el gráfico dice que nadie pasa el filtro.
+- El filtro está en `R/dashboard_filter.R`. `test-dashboard.R`: 4 pasadas. No entra en `run_all.R` ni en `targets`.
