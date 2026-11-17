@@ -45,6 +45,7 @@ retail_coh <- tab("10_cohort_summary.csv")
 bnpl_m <- tab("11_holdout_metrics.csv")
 bnpl_p <- tab("11_palive_summary.csv")
 bnpl_r <- tab("11_parameter_recovery.csv")
+rec_n <- tab("12_recovery_by_n_summary.csv")
 rec <- tab("07_parameter_recovery.csv")
 cov <- tab("06_covariates_comparison.csv")
 clv <- tab("04_clv_pnbd_52w.csv")
@@ -295,6 +296,23 @@ El Pareto/NBD baja el MAE del baseline de `r sprintf("%.3f", bnpl_m[model == "na
 
 Con 2,000 comercios las medias no se recuperan igual de bien que en la simulación de 3,000. \(E[\mu]\) tiene un error relativo de `r sprintf("%.0f", 100 * bnpl_r[param == "E[mu]=s/beta", rel_error])`%. El score ordena la actividad futura aunque los parámetros de abandono sigan débiles. Eso no convierte el marco en un modelo de impago.
 
+## Cuántos comercios hacen falta
+
+La corrida de 2,000 comercios con semilla 42 dejó \(E[\mu]\) un 34% arriba. Para ver si eso es el tamaño de muestra o esa semilla, se fijó antes de mirar el resultado una grilla de 500, 1,000, 2,000, 3,000 y 5,000 comercios, con las semillas 1 a 10. El panel de la semilla 42 no se tocó. En 500 y 1,000 comercios hay ajustes que devuelven coeficientes `NA` (1 y 2 de 10). El resumen usa la mediana del error absoluto, porque a n = 1,000 una semilla se va a +905% y la media deja de servir.
+
+```{r}
+#| echo: false
+show_n <- copy(rec_n)
+show_n[, param := fifelse(param == "E[lambda]=r/alpha", "E[lambda]", "E[mu]")]
+show_n[, `mediana |error| %` := round(100 * median_abs_rel_error, 1)]
+kable(show_n[, .(n, param, n_ok, `mediana |error| %`)],
+      caption = "Diez semillas por tamaño. El error es el de la media implícita.")
+```
+
+![Mediana del error absoluto según el número de comercios.](../outputs/figures/12_recovery_by_n.png)
+
+\(E[\lambda]\) baja a un error mediano de `r sprintf("%.1f", 100 * rec_n[n == 2000 & param == "E[lambda]=r/alpha", median_abs_rel_error])`% con 2,000 comercios y se queda cerca de `r sprintf("%.1f", 100 * rec_n[n == 5000 & param == "E[lambda]=r/alpha", median_abs_rel_error])`% con 5,000. \(E[\mu]\) va de `r sprintf("%.0f", 100 * rec_n[n == 500 & param == "E[mu]=s/beta", median_abs_rel_error])`% a `r sprintf("%.0f", 100 * rec_n[n == 5000 & param == "E[mu]=s/beta", median_abs_rel_error])`%. Con 5,000 comercios el abandono sigue sin estar bien identificado. El +2% de la simulación de 3,000 con semilla 42 fue un sorteo favorable: en estas diez semillas el error mediano a 3,000 es `r sprintf("%.0f", 100 * rec_n[n == 3000 & param == "E[mu]=s/beta", median_abs_rel_error])`%.
+
 ## Limitaciones
 
 - El contexto es sin contrato. Este marco no vale para suscripciones ni para préstamos, donde el abandono sí se observa.
@@ -319,6 +337,7 @@ Rscript R/08_rolling_origin.R
 Rscript R/09_uncertainty.R
 Rscript R/10_online_retail.R
 Rscript R/11_bnpl_merchants.R
+Rscript R/12_recovery_by_n.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'

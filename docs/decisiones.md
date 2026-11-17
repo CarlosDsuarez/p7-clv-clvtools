@@ -162,3 +162,13 @@ Fase B de la spec. No se modificó `EST_SPLIT_WEEKS` ni `run_all.R`. El xlsx de 
 - Holdout (`11_holdout_metrics.csv`): Pareto/NBD MAE 0.716, GGom/NBD 0.716, BG/NBD 0.747, baseline 0.913. La ventaja frente al baseline vuelve cuando los datos salen del modelo. En Online Retail II era menor al 1%.
 - Actividad futura (`11_palive_summary.csv`): media de PAlive 0.487. El 73.2% queda bajo 0.5 y en el holdout origina 0.15 veces de media. Quienes están en 0.5 o más originan 2.39. En el decil de mayor monto durante la estimación, solo el 13.5% tiene PAlive bajo 0.5.
 - Recuperación (`11_parameter_recovery.csv`): con 2,000 comercios \(E[\lambda]\) erra −5.3% y \(E[\mu]\) +34.5%. Peor que la simulación de 3,000, donde las medias volvían a 1–2%. El orden de la actividad futura se sostiene igual. No se sube `n` después de ver el error.
+
+## 2026-11-17 — Tamaño de muestra de la recuperación (`R/12_recovery_by_n.R`)
+
+La grilla se escribió antes de correrla: n = 500, 1,000, 2,000, 3,000 y 5,000; semillas 1 a 10; mismos parámetros y el mismo corte de 39 semanas. No se reusa la semilla 42. No se cambia `EST_SPLIT_WEEKS`. No entra en `run_all.R` ni en `targets`.
+
+- Resumen en `12_recovery_by_n_summary.csv`. La cifra que se lee es la mediana del error absoluto. La media no sirve a n = 1,000: una semilla llega a +905% en \(E[\mu]\).
+- Ajustes con coeficientes `NA`: 1 de 10 en n = 500 y 2 de 10 en n = 1,000. Desde 2,000, los 10 convergen.
+- \(E[\lambda]\): mediana del error absoluto 7.9% (500), 4.5% (2,000), 3.8% (5,000).
+- \(E[\mu]\): 42.6% (500), 25.2% (2,000), 16.8% (3,000), 14.1% (5,000). A n = 2,000 el rango de las diez semillas es −45% a +47%, así que el +34.5% de la semilla 42 no es un caso aparte.
+- El +2% de la simulación de 3,000 con semilla 42 fue un sorteo favorable frente a estas diez semillas.
