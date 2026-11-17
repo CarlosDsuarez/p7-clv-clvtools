@@ -153,3 +153,12 @@ Fase B de la spec. No se modificó `EST_SPLIT_WEEKS` ni `run_all.R`. El xlsx de 
 - AIC y holdout eligen BG/NBD. MAE 2.026 frente a 2.041 del baseline: menos de un 1%. En CDNOW esa ventaja era ~26% (`10_vs_cdnow.csv`). El GGom/NBD tiene `b` = 0.006 y un logLik casi igual al Pareto/NBD.
 - Decil 1: predicho 0.723, observado 0.727. No se repite la subestimación de CDNOW. El decil superior concentra el 55.3% del CLV (CDNOW, 61.3%).
 - El minorista es estacional y el modelo no tiene calendario. El empate con el baseline es de este diseño, no una conclusión general.
+
+## 2026-11-17 — Comercios BNPL sintéticos (`R/11_bnpl_merchants.R`)
+
+Última extensión de la sección 11. No hay un archivo P13 en esta máquina, así que no se usa una cartera ajena. El panel lo genera `simulate_bnpl_merchants()` con el Pareto/NBD de `R/simulate.R`: 2,000 comercios, semilla 42, primera originación en las primeras 12 semanas, ventana de 78. `EST_SPLIT_WEEKS` sigue en 39. No entra en `run_all.R` ni en `targets`.
+
+- `Id` es el comercio, `Date` un día con originación y `Price` el monto de esa ocasión. `PAlive` es la probabilidad de seguir originando. No es probabilidad de repago ni de default.
+- Holdout (`11_holdout_metrics.csv`): Pareto/NBD MAE 0.716, GGom/NBD 0.716, BG/NBD 0.747, baseline 0.913. La ventaja frente al baseline vuelve cuando los datos salen del modelo. En Online Retail II era menor al 1%.
+- Actividad futura (`11_palive_summary.csv`): media de PAlive 0.487. El 73.2% queda bajo 0.5 y en el holdout origina 0.15 veces de media. Quienes están en 0.5 o más originan 2.39. En el decil de mayor monto durante la estimación, solo el 13.5% tiene PAlive bajo 0.5.
+- Recuperación (`11_parameter_recovery.csv`): con 2,000 comercios \(E[\lambda]\) erra −5.3% y \(E[\mu]\) +34.5%. Peor que la simulación de 3,000, donde las medias volvían a 1–2%. El orden de la actividad futura se sostiene igual. No se sube `n` después de ver el error.

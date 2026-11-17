@@ -42,6 +42,9 @@ clv_sum <- tab("09_clv_uncertainty_summary.csv")
 retail_vs <- tab("10_vs_cdnow.csv")
 retail_cal <- tab("10_calibration_pnbd_deciles.csv")
 retail_coh <- tab("10_cohort_summary.csv")
+bnpl_m <- tab("11_holdout_metrics.csv")
+bnpl_p <- tab("11_palive_summary.csv")
+bnpl_r <- tab("11_parameter_recovery.csv")
 rec <- tab("07_parameter_recovery.csv")
 cov <- tab("06_covariates_comparison.csv")
 clv <- tab("04_clv_pnbd_52w.csv")
@@ -277,6 +280,21 @@ En CDNOW el mejor modelo le baja al baseline cerca de un cuarto del MAE. Aquí e
 
 El decil 1 predice `r sprintf("%.3f", retail_cal[bin == 1, mean_pred])` y observa `r sprintf("%.3f", retail_cal[bin == 1, mean_actual])`. No aparece la subestimación de los deciles bajos de CDNOW. El decil superior concentra el `r sprintf("%.1f", 100 * retail_coh$top_decile_clv_share)`% del CLV, frente al 61.3% de CDNOW. El negocio es estacional y el modelo no tiene calendario: el empate con el baseline es de este corte, no una ley.
 
+## Comercios BNPL
+
+No hay un archivo P13 en esta máquina. El puente usa 2,000 comercios sintéticos del mismo Pareto/NBD, con semilla 42. `Id` es el comercio, `Date` un día con originación y `Price` el monto de esa ocasión. `PAlive` es la probabilidad de seguir originando. No es la probabilidad de que el crédito se pague, y el panel no es una cartera real.
+
+```{r}
+#| echo: false
+kable(bnpl_m, digits = 3, caption = "Holdout de los comercios sintéticos.")
+```
+
+El Pareto/NBD baja el MAE del baseline de `r sprintf("%.3f", bnpl_m[model == "naive_rate", MAE])` a `r sprintf("%.3f", bnpl_m[model == "pnbd", MAE])`. Cuando los datos salen del modelo, la ventaja reaparece; en Online Retail II casi no estaba. Los comercios con `PAlive` menor que 0.5 originan en el holdout `r sprintf("%.2f", bnpl_p$mean_actual_low_palive)` veces de media, y los que están por encima originan `r sprintf("%.2f", bnpl_p$mean_actual_high_palive)`. El `r sprintf("%.1f", 100 * bnpl_p$share_palive_below_0.5)`% queda por debajo de 0.5. En el decil de mayor monto originado durante la estimación, esa fracción es `r sprintf("%.1f", 100 * bnpl_p$share_top_volume_below_0.5)`%: el volumen está concentrado en comercios que el modelo todavía da por activos.
+
+![Probabilidad de seguir originando.](../outputs/figures/11_palive.png)
+
+Con 2,000 comercios las medias no se recuperan igual de bien que en la simulación de 3,000. \(E[\mu]\) tiene un error relativo de `r sprintf("%.0f", 100 * bnpl_r[param == "E[mu]=s/beta", rel_error])`%. El score ordena la actividad futura aunque los parámetros de abandono sigan débiles. Eso no convierte el marco en un modelo de impago.
+
 ## Limitaciones
 
 - El contexto es sin contrato. Este marco no vale para suscripciones ni para préstamos, donde el abandono sí se observa.
@@ -300,6 +318,7 @@ Rscript R/run_all.R
 Rscript R/08_rolling_origin.R
 Rscript R/09_uncertainty.R
 Rscript R/10_online_retail.R
+Rscript R/11_bnpl_merchants.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
