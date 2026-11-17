@@ -11,6 +11,7 @@ Hace falta R ≥ 4.3. CLVTools es GPL-3; si se compila desde fuente hace falta G
 ```bash
 Rscript -e 'renv::restore()'
 Rscript R/run_all.R
+Rscript R/08_rolling_origin.R
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
 quarto render reports/p7_clv.qmd
 ```
@@ -31,6 +32,8 @@ Holdout de 38.7 semanas, 2,357 clientes (`outputs/tables/03_holdout_metrics.csv`
 
 Por AIC, en la ventana de estimación, gana BG/NBD (19,213.7 frente a 19,238.5 del Pareto/NBD). GGom/NBD empata el logLik del Pareto/NBD y no es un modelo distinto: `b` y `beta` caen al límite.
 
+Ese holdout es uno solo. Con horizonte fijo de 13 semanas y cortes en 26, 39, 52 y 64 (`outputs/tables/08_rolling_origin_summary.csv`), el MAE medio es 0.330 para Pareto/NBD y GGom/NBD (sd 0.044), 0.335 para BG/NBD y 0.398 para el baseline. El orden se repite en los cuatro cortes. La ventaja del Pareto/NBD sobre BG/NBD es de unas cinco milésimas, menor que la dispersión entre cortes. Estos MAE no se comparan con los de 38.7 semanas: el horizonte es otro, y el error absoluto baja porque la cohorte compra menos.
+
 El decil superior concentra el 61.3% del CLV. Ese CLV es de horizonte infinito (5% de descuento → 455,354; 10% → 317,281; 15% → 254,668; 20% → 217,210). El horizonte mueve el gasto del período, no el CLV: 13 semanas → 22,654; 26 → 42,309; 52 → 75,713; 104 → 128,544.
 
 En la simulación (3,000 clientes), $s$ y $\beta$ se recuperan con errores de −14.9% y −16.6%. $E[\lambda]$ y $E[\mu]$ vuelven a +1.1% y +2.0%.
@@ -38,7 +41,7 @@ En la simulación (3,000 clientes), $s$ y $\beta$ se recuperan con errores de �
 ## Limitaciones
 
 - Sirve para contextos sin contrato. No aplica a suscripciones ni a préstamos.
-- Hay un solo holdout. La ventaja del Pareto/NBD sobre BG/NBD es de un 4% y no trae intervalo. El AIC elige el otro modelo.
+- El holdout de 38.7 semanas sigue siendo uno. En las ventanas de 13 semanas el signo se repite y la ventaja sobre BG/NBD es pequeña frente a la dispersión entre cortes. El AIC en muestra sigue eligiendo BG/NBD.
 - El agregado acumulado ajusta bien y los deciles bajos no: el modelo predice 0.108 compras donde se observan 0.251. Es una hipótesis, no un hallazgo cerrado.
 - Spearman(frecuencia, gasto medio) = 0.165. El Gamma/Gamma asume independencia; la relación es débil y no es nula.
 - XGBoost usa ventanas de distinto largo (19 frente a ~39 semanas), normalizadas a tasas, y hiperparámetros fijos. Su MAE aquí es 0.908; la referencia de la especificación, en R 4.3.3, daba 0.915. El orden es el mismo.

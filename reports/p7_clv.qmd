@@ -34,6 +34,8 @@ cal <- tab("03_calibration_pnbd_deciles.csv")
 disc <- tab("04_sensitivity_discount.csv")
 hor <- tab("04_sensitivity_horizon.csv")
 bench <- tab("05_benchmark.csv")
+roll <- tab("08_rolling_origin.csv")
+roll_sum <- tab("08_rolling_origin_summary.csv")
 rec <- tab("07_parameter_recovery.csv")
 cov <- tab("06_covariates_comparison.csv")
 clv <- tab("04_clv_pnbd_52w.csv")
@@ -185,6 +187,24 @@ p_bench
 
 XGBoost baja el MAE del baseline un `r sprintf("%.0f", xgb_vs_naive)`% y queda un `r sprintf("%.0f", xgb_vs_pnbd)`% por encima del Pareto/NBD. El sesgo del árbol es `r sprintf("%+.3f", bench[model == "xgb", bias])`; el del Pareto/NBD es `r sprintf("%+.3f", bench[model == "pnbd", bias])`. En la referencia de la especificación el MAE de XGBoost era 0.915 (aquí `r sprintf("%.3f", mae_xgb)`). El orden no cambia. La diferencia cabe en el binario: R 4.6.0 en macOS arm64 frente a R 4.3.3 en Ubuntu, con la misma versión de xgboost (3.2.1.1) y los mismos hiperparámetros.
 
+## Ventanas móviles
+
+El holdout de 38.7 semanas es uno solo. Para ver si el orden se sostiene, el mismo ejercicio se repite con horizonte fijo de 13 semanas en cuatro cortes de estimación: 26, 39, 52 y 64. El de 39 es el corte del pipeline, pero el horizonte no es el de 38.7 semanas: estos MAE no se comparan con la tabla anterior. El error absoluto baja a medida que la cohorte envejece, porque hay menos compras que errar. Lo que se lee es el orden dentro de cada corte.
+
+```{r}
+#| echo: false
+kable(roll, digits = 3, caption = "MAE en las 13 semanas siguientes a cada corte. 2,357 clientes en todos.")
+```
+
+```{r}
+#| echo: false
+kable(roll_sum, digits = 3, caption = "Media y dispersión del MAE entre los cuatro cortes.")
+```
+
+![MAE por corte de estimación, horizonte de 13 semanas.](../outputs/figures/08_rolling_mae.png)
+
+El MAE medio del Pareto/NBD es `r sprintf("%.3f", roll_sum[model == "pnbd", MAE_mean])` (sd `r sprintf("%.3f", roll_sum[model == "pnbd", MAE_sd])`). El GGom/NBD da `r sprintf("%.3f", roll_sum[model == "ggomnbd", MAE_mean])`: sigue colapsando al mismo modelo (en los cortes de 26 y 64 el logLik coincide y $b$ es del orden de $10^{-6}$). BG/NBD queda en `r sprintf("%.3f", roll_sum[model == "bgnbd", MAE_mean])` y el baseline en `r sprintf("%.3f", roll_sum[model == "naive_rate", MAE_mean])`. En los cuatro cortes los BTYD baten al baseline y el Pareto/NBD queda por debajo de BG/NBD. Esa ventaja media es de unas cinco milésimas de MAE, menor que la dispersión entre cortes. El signo es estable. El tamaño de la ventaja no se separa del calendario.
+
 ## Sensibilidad y concentración de valor
 
 `predicted.CLV` es DERT por gasto medio, con horizonte infinito. Por eso el total depende de la tasa de descuento y no de `prediction.end`. El horizonte solo mueve `CET` y `predicted.period.spending`. Medir la sensibilidad al horizonte con el CLV habría dado la misma cifra tres veces.
@@ -223,7 +243,7 @@ $s$ y $\beta$ se recuperan mal (errores del orden del 15%): están débilmente i
 ## Limitaciones
 
 - El contexto es sin contrato. Este marco no vale para suscripciones ni para préstamos, donde el abandono sí se observa.
-- Hay un solo holdout. Las diferencias pequeñas, en particular Pareto/NBD contra BG/NBD, no traen intervalo.
+- El holdout largo sigue siendo uno y no trae intervalo. En cuatro cortes con horizonte de 13 semanas el signo se repite (Pareto/NBD por debajo de BG/NBD, ambos por debajo del baseline), pero la ventaja sobre BG/NBD es menor que la dispersión entre cortes.
 - El AIC en muestra y el MAE en holdout no eligen el mismo modelo. Se reportan los dos.
 - El seguimiento acumulado ajusta bien y la calibración individual no. La subestimación en deciles bajos es una hipótesis.
 - GGom/NBD colapsa al Pareto/NBD en CDNOW. Presentarlo como un modelo distinto inflaría la comparación.
@@ -240,6 +260,7 @@ Desde la raíz del repositorio, con R ≥ 4.3:
 ```bash
 Rscript -e 'renv::restore()'
 Rscript R/run_all.R
+Rscript R/08_rolling_origin.R
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
 quarto render reports/p7_clv.qmd
 ```

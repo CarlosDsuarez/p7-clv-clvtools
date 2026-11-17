@@ -107,3 +107,14 @@ s y beta se recuperan peor (débilmente identificados y correlacionados). Las me
 - Para el reporte se añadieron a renv `knitr` 1.52 y `rmarkdown` 2.32. No entran en el ajuste de los modelos.
 - Quarto 1.11.9 produjo `reports/p7_clv.html`. El paquete de macOS pedía contraseña de administrador; se usó el tarball en el directorio del usuario. Quarto no es dependencia de `run_all.R`.
 - Las cifras del README y del html salen de `outputs/tables/*.csv`. El Spearman 0.165 se vuelve a calcular en el reporte con la misma fórmula del paso 4, porque el script solo lo imprime y no lo guarda en un CSV.
+
+## 2026-11-17 — Ventanas móviles (`R/08_rolling_origin.R`)
+
+Extensión de la sección 11 de la spec. No se modificó `EST_SPLIT_WEEKS` ni `R/run_all.R`: el pipeline de las fases 1–7 queda igual y este paso se corre aparte.
+
+- Horizonte fijo de 13 semanas, para que el MAE sea comparable entre cortes. Cortes: 26, 39, 52 y 64. El 64 es el más tardío que aún deja 13 semanas antes del fin de CDNOW (77.86 semanas). El 39 es el corte canónico, con otro horizonte: estos MAE no se comparan con `03_holdout_metrics.csv`.
+- 2,357 clientes en los cuatro cortes.
+- MAE medio (`08_rolling_origin_summary.csv`): GGom/NBD 0.330 (sd 0.044), Pareto/NBD 0.330 (sd 0.044), BG/NBD 0.335 (sd 0.045), baseline 0.398 (sd 0.059).
+- En los cortes 26 y 64 el GGom tiene el mismo logLik que el Pareto/NBD y `b` del orden de 1e-6. Sigue siendo el mismo modelo.
+- En los cuatro cortes los BTYD baten al baseline y el Pareto/NBD queda por debajo de BG/NBD. La diferencia media de MAE entre esos dos es ~0.005, menor que la sd entre cortes. El signo es estable; el tamaño de la ventaja no.
+- El MAE absoluto cae del corte 26 (0.387) al 64 (0.286) para el Pareto/NBD porque la cohorte compra menos, no porque el modelo se vuelva más preciso en esa proporción.
