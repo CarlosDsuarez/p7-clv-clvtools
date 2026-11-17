@@ -54,6 +54,7 @@ hold_rank <- tab("16_holdout_rank.csv")
 freq_mae <- tab("17_mae_by_frequency.csv")
 age_mae <- tab("18_short_age.csv")
 gap_mae <- tab("19_recency_gap.csv")
+shrink_mae <- tab("20_rate_shrinkage.csv")
 rec <- tab("07_parameter_recovery.csv")
 cov <- tab("06_covariates_comparison.csv")
 clv <- tab("04_clv_pnbd_52w.csv")
@@ -453,6 +454,35 @@ Los `r gap_mae[dataset == "cdnow" & cell == "6+_silent" & model == "bgnbd", n_cu
 
 En el minorista, `r gap_mae[dataset == "online_retail_ii" & cell == "6+_recent" & model == "bgnbd", n_customers]` de `r gap_mae[dataset == "online_retail_ii" & cell == "6+_recent" & model == "bgnbd", n_customers] + gap_mae[dataset == "online_retail_ii" & cell == "6+_silent" & model == "bgnbd", n_customers]` siguen comprando en la segunda mitad, con P(activo) `r sprintf("%.3f", gap_mae[dataset == "online_retail_ii" & cell == "6+_recent" & model == "bgnbd", mean_palive])`. El MAE de la tasa sobre 39 semanas es `r sprintf("%.2f", gap_mae[dataset == "online_retail_ii" & cell == "6+_recent" & model == "naive_calendar", MAE])` y el del BG/NBD `r sprintf("%.2f", gap_mae[dataset == "online_retail_ii" & cell == "6+_recent" & model == "bgnbd", MAE])`. Ahí la tasa empata, en el dataset donde el tramo completo ya empataba.
 
+## Mitad rápida
+
+La hipótesis, fijada antes de mirar el error, parte a esos compradores recientes con seis o más compras por la mediana de su tasa `(n-1)/edad`. En las dos mitades el BG/NBD debía predecir menos que la tasa sobre 39 semanas, y el exceso de esa tasa debía ser mayor en la mitad alta. En esa mitad, multiplicar la tasa por la P(activo) del BG/NBD debía dejar la media por encima de la predicción del modelo.
+
+```{r}
+#| echo: false
+sh <- copy(shrink_mae[cell != "recent_all"])
+sh[, cell := factor(cell, levels = c("recent_low", "recent_high"))]
+sh[, model := factor(model, levels = c(
+  "naive_calendar", "calendar_x_bgnbd", "calendar_x_pnbd", "bgnbd", "pnbd"
+))]
+setorder(sh, dataset, cell, model)
+sh[, mean_actual := round(mean_actual, 2)]
+sh[, mean_pred := round(mean_pred, 2)]
+sh[, bias := round(bias, 2)]
+sh[, MAE := round(MAE, 2)]
+sh[, mean_palive := round(mean_palive, 3)]
+kable(sh[, .(dataset, cell, model, n_customers, mean_actual, mean_pred, bias, MAE, mean_palive)],
+      caption = "Recientes con seis o más compras. La mediana de (n-1)/edad separa las mitades. calendar_x_bgnbd multiplica la tasa de 39 semanas por la P(activo). bias es predicción media menos observado.")
+```
+
+![Exceso de la predicción en las dos mitades de la tasa.](../outputs/figures/20_rate_shrinkage.png)
+
+La hipótesis se sostiene. En CDNOW cada mitad tiene `r shrink_mae[dataset == "cdnow" & cell == "recent_high" & model == "bgnbd", n_customers]` clientes. En la alta, la tasa predice `r sprintf("%.2f", shrink_mae[dataset == "cdnow" & cell == "recent_high" & model == "naive_calendar", mean_pred])` y se observan `r sprintf("%.2f", shrink_mae[dataset == "cdnow" & cell == "recent_high" & model == "naive_calendar", mean_actual])` (exceso `r sprintf("%.2f", shrink_mae[dataset == "cdnow" & cell == "recent_high" & model == "naive_calendar", bias])`). Multiplicar por la P(activo) baja la media a `r sprintf("%.2f", shrink_mae[dataset == "cdnow" & cell == "recent_high" & model == "calendar_x_bgnbd", mean_pred])`. El BG/NBD llega a `r sprintf("%.2f", shrink_mae[dataset == "cdnow" & cell == "recent_high" & model == "bgnbd", mean_pred])` y el Pareto/NBD a `r sprintf("%.2f", shrink_mae[dataset == "cdnow" & cell == "recent_high" & model == "pnbd", mean_pred])`. En la baja, la tasa predice `r sprintf("%.2f", shrink_mae[dataset == "cdnow" & cell == "recent_low" & model == "naive_calendar", mean_pred])` (exceso `r sprintf("%.2f", shrink_mae[dataset == "cdnow" & cell == "recent_low" & model == "naive_calendar", bias])`, menor que en la alta). La P(activo) deja `r sprintf("%.2f", shrink_mae[dataset == "cdnow" & cell == "recent_low" & model == "calendar_x_bgnbd", mean_pred])` frente a `r sprintf("%.2f", shrink_mae[dataset == "cdnow" & cell == "recent_low" & model == "naive_calendar", mean_actual])` observado, y el BG/NBD sigue hasta `r sprintf("%.2f", shrink_mae[dataset == "cdnow" & cell == "recent_low" & model == "bgnbd", mean_pred])`.
+
+Las 124 personas juntas reproducen el corte anterior: la tasa predice `r sprintf("%.2f", shrink_mae[dataset == "cdnow" & cell == "recent_all" & model == "naive_calendar", mean_pred])`, la tasa por la P(activo) `r sprintf("%.2f", shrink_mae[dataset == "cdnow" & cell == "recent_all" & model == "calendar_x_bgnbd", mean_pred])` y el BG/NBD `r sprintf("%.2f", shrink_mae[dataset == "cdnow" & cell == "recent_all" & model == "bgnbd", mean_pred])`, con `r sprintf("%.2f", shrink_mae[dataset == "cdnow" & cell == "recent_all" & model == "bgnbd", mean_actual])` observado.
+
+En el minorista la P(activo) de la mitad alta es `r sprintf("%.3f", shrink_mae[dataset == "online_retail_ii" & cell == "recent_high" & model == "bgnbd", mean_palive])`, así que multiplicar por ella mueve la tasa de `r sprintf("%.2f", shrink_mae[dataset == "online_retail_ii" & cell == "recent_high" & model == "naive_calendar", mean_pred])` a `r sprintf("%.2f", shrink_mae[dataset == "online_retail_ii" & cell == "recent_high" & model == "calendar_x_bgnbd", mean_pred])`. El BG/NBD baja a `r sprintf("%.2f", shrink_mae[dataset == "online_retail_ii" & cell == "recent_high" & model == "bgnbd", mean_pred])`, con `r sprintf("%.2f", shrink_mae[dataset == "online_retail_ii" & cell == "recent_high" & model == "bgnbd", mean_actual])` observado. En la mitad baja las tres medias quedan entre `r sprintf("%.2f", shrink_mae[dataset == "online_retail_ii" & cell == "recent_low" & model == "bgnbd", mean_pred])` y `r sprintf("%.2f", shrink_mae[dataset == "online_retail_ii" & cell == "recent_low" & model == "naive_calendar", mean_pred])`, y lo observado es `r sprintf("%.2f", shrink_mae[dataset == "online_retail_ii" & cell == "recent_low" & model == "naive_calendar", mean_actual])`. El exceso de la tasa es `r sprintf("%.2f", shrink_mae[dataset == "online_retail_ii" & cell == "recent_high" & model == "naive_calendar", bias])` arriba y `r sprintf("%.2f", shrink_mae[dataset == "online_retail_ii" & cell == "recent_low" & model == "naive_calendar", bias])` abajo.
+
 ## Limitaciones
 
 - El contexto es sin contrato. Este marco no vale para suscripciones ni para préstamos, donde el abandono sí se observa.
@@ -485,6 +515,7 @@ Rscript R/16_holdout_rank.R
 Rscript R/17_frequency_strata.R
 Rscript R/18_short_age.R
 Rscript R/19_recency_gap.R
+Rscript R/20_rate_shrinkage.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'

@@ -23,6 +23,7 @@ Rscript R/16_holdout_rank.R
 Rscript R/17_frequency_strata.R
 Rscript R/18_short_age.R
 Rscript R/19_recency_gap.R
+Rscript R/20_rate_shrinkage.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
@@ -54,6 +55,8 @@ Online Retail II no está en el repositorio. El script `R/10_online_retail.R` es
 `R/18_short_age.R` pregunta si ese exceso es de quien empezó tarde y tiene un denominador corto. No: nadie con seis o más compras empezó en la segunda mitad de las 39 semanas. Dividir siempre entre 39 baja el pronóstico de CDNOW de 9.28 a 7.92, y lo observado es 4.77. El BG/NBD queda en 4.50. El denominador explica una parte, no el exceso.
 
 `R/19_recency_gap.R` pregunta si lo que queda es de quien lleva semanas sin comprar. En CDNOW son 8 de 132. Los otros 124 compraron en la segunda mitad (última compra en la semana 33.6) y el BG/NBD les da P(activo) 0.72. La tasa sobre 39 semanas sigue en 7.95 frente a 4.98 observado; el BG/NBD queda en 4.77. En el minorista, 403 de 408 siguen activos (P(activo) 0.996) y las dos cifras empatan (MAE 3.95 y 3.98).
+
+`R/20_rate_shrinkage.R` parte esos 124 por la mediana de su tasa. En la mitad rápida la tasa predice 10.37 y se observan 6.27. Multiplicar por la P(activo) baja eso a 7.86, y el BG/NBD llega a 6.38. En la mitad lenta, la P(activo) deja 3.79 frente a 3.68, y el BG/NBD sigue hasta 3.17. En el minorista la P(activo) es 0.997 y casi no mueve la tasa; el BG/NBD baja la mitad rápida de 14.68 a 13.20, con 12.83 observadas.
 
 ## Resultados
 

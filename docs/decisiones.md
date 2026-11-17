@@ -233,3 +233,11 @@ Hipótesis escrita antes de mirar el error: el exceso que queda al dividir entre
 - La hipótesis no se sostiene en CDNOW (`19_recency_gap.csv`). La celda quieta tiene 8 clientes (última compra en la semana 13.3, P(activo) del BG/NBD 0.05). La tasa sobre 39 semanas predice 7.47 y se observan 1.50; el BG/NBD baja a 0.23.
 - Los otros 124 compraron en la segunda mitad (semana 33.6) y la P(activo) es 0.72. La tasa predice 7.95 donde se observan 4.98 (MAE 4.90). El BG/NBD predice 4.77 (MAE 3.38). El exceso de la fase 18 sigue en clientes a los que el modelo da por activos.
 - Online Retail: 403 de 408 están en la segunda mitad, con P(activo) 0.996. El MAE de la tasa sobre 39 semanas es 3.95 y el del BG/NBD 3.98. Los 5 quietos no mueven el tramo.
+
+## 2026-11-17 — Mitad rápida de la tasa (`R/20_rate_shrinkage.R`)
+
+Hipótesis escrita antes de mirar el error: entre los clientes con 6 o más compras y última compra en la segunda mitad, la mediana de `(n-1)/edad` (empate a la mitad alta) separa dos grupos. En los dos el BG/NBD predice menos que `(n-1)/39`. El exceso de esa tasa es mayor en la mitad alta. En la alta, multiplicar la tasa por la P(activo) del BG/NBD deja la media por encima del BG/NBD. Mismos datos que la fase 19. No entra en `run_all.R` ni en `targets`.
+
+- La hipótesis se sostiene en los dos datasets (`20_rate_shrinkage.csv`). La fila `recent_all` de CDNOW reproduce la fase 19: tasa 7.95, BG/NBD 4.77, observado 4.98, 124 clientes. La tasa por la P(activo) queda en 5.82.
+- CDNOW, mitad alta (62): tasa 10.37 (exceso 4.09), tasa por P(activo) 7.86, BG/NBD 6.38, Pareto/NBD 6.62, observado 6.27. Mitad baja (62): tasa 5.53 (exceso 1.85), tasa por P(activo) 3.79, BG/NBD 3.17, observado 3.68. En la baja, la P(activo) ya queda al lado de lo observado y el modelo sigue un poco más abajo.
+- Online Retail, mitad alta (202): P(activo) 0.997, así que la tasa pasa de 14.68 a 14.65 al multiplicarla. El BG/NBD baja a 13.20, con 12.83 observado (exceso de la tasa 1.85). Mitad baja (201): tasa 5.74, BG/NBD 5.68, observado 5.32 (exceso de la tasa 0.42).
