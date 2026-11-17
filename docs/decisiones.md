@@ -45,3 +45,14 @@ Holdout de 38.7 semanas. Cifras de `outputs/tables/03_holdout_metrics.csv`. Coin
 El MAE del Pareto/NBD es ~26% menor que el del baseline (0.751 frente a 1.018). El AIC de la fase 2 prefería BG/NBD; el MAE de este único holdout prefiere Pareto/NBD, con una diferencia de ~4% y sin intervalo. No se concluye más que eso.
 
 Calibración del Pareto/NBD (`03_calibration_pnbd_deciles.csv`): subestima en deciles bajos (decil 1: 0.108 predicho frente a 0.251 observado; decil 6: 0.164 frente a 0.343) y calibra bien arriba (decil 9: 1.308 frente a 1.254; decil 10: 3.865 frente a 3.737). La subestimación en baja actividad queda como hipótesis, no como resultado. El gráfico agregado está en `outputs/figures/03_tracking_pnbd.png`. Mismo aviso de `scale_x_date` que en la fase 1; el PNG se escribió.
+
+## 2026-11-17 — Corrida de `R/04_spending_clv.R`
+
+Gamma/Gamma convergió (KKT 1 y 2 verdaderos). LL −4055.80, AIC 8117.59, BIC 8134.89. Coeficientes: p 6.238, q 3.746, gamma 15.478. `summary` deja `z` y el p-valor en NA; no se reescribió el script.
+
+- Spearman(frecuencia, gasto medio) = 0.165 en clientes con al menos dos compras en la estimación. Relación débil: el supuesto de independencia del Gamma/Gamma es razonable y no es perfecto. Queda como limitación.
+- Decil superior: 61.3% del `predicted.CLV`.
+- CLV total (horizonte infinito; `04_sensitivity_discount.csv`): 5% → 455,354; 10% → 317,281; 15% → 254,668; 20% → 217,210.
+- Gasto esperado del período (`04_sensitivity_horizon.csv`, `predicted.period.spending`): 13 sem → 22,654; 26 → 42,309; 52 → 75,713; 104 → 128,544.
+
+La sensibilidad al horizonte no usa `predicted.CLV`: esa columna es DERT por gasto medio, con horizonte infinito, y solo se mueve con el descuento. El descuento es la tasa continua semanal `log(1.10)/52`. Cifras alineadas con la referencia.
