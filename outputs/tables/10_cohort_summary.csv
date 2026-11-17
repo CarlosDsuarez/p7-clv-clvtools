@@ -1,0 +1,2 @@
+origin,end,n_input,n_missing_id,n_invoices,n_identified,n_cohort,n_transactions,first_weeks,split_weeks,H_weeks,aic_winner,holdout_winner,ggom_b,top_decile_clv_share
+2009-12-01,2011-05-31,1067371,243007,36969,5878,1729,14113,13,39,39,bgnbd,bgnbd,0.00627126297426109,0.55268546278704

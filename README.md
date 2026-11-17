@@ -13,6 +13,7 @@ Rscript -e 'renv::restore()'
 Rscript R/run_all.R
 Rscript R/08_rolling_origin.R
 Rscript R/09_uncertainty.R
+Rscript R/10_online_retail.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
@@ -24,6 +25,8 @@ Los parámetros viven en `R/00_utils.R` (semilla 42, unidad semanal, descuento a
 `targets::tar_make()` corre los mismos scripts y guarda la caché en `_targets/`, que no se sube a git. La primera vez tarda lo mismo que el pipeline; la siguiente, si nada cambió, no reajusta. `run_all.R` sigue siendo el camino sin esa capa.
 
 `shiny::runApp("shiny")` abre el CLV por cliente. No reajusta: lee `04_clv_pnbd_52w.csv` y los intervalos de `09_clv_intervals.csv`. Filtra por P(activo), CLV mínimo e Id.
+
+Online Retail II no está en el repositorio. El script `R/10_online_retail.R` espera `data/raw/online_retail_II.xlsx` (UCI). La cohorte son las primeras 13 semanas desde el 2009-12-01, con el mismo corte de 39 semanas. En ese corte el BG/NBD casi empata al baseline (MAE 2.026 frente a 2.041). En CDNOW la ventaja era de cerca de un 26%.
 
 ## Resultados
 

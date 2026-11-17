@@ -143,3 +143,13 @@ Extensión de la sección 11. No se reajustan modelos ni se cambia `EST_SPLIT_WE
 - shiny 1.14.0 y DT 0.34.0. La app lee `04_clv_pnbd_52w.csv` y `09_clv_intervals.csv`. El CLV que muestra es el de horizonte infinito al 10%; el CET de esa tabla es a 52 semanas, no el holdout de 38.7.
 - Filtros: P(activo) mínima, CLV mínimo e Id. Sin filtro muestra 2,357 clientes y CLV 317,281 (100%). Con Id `509` quedan 2 clientes (509 y 1509) y CLV 5,306 (1.7%). Con P(activo) ≥ 0.95 quedan 137 clientes y CLV 103,924 (32.8%). Un Id inexistente deja la tabla vacía y el gráfico dice que nadie pasa el filtro.
 - El filtro está en `R/dashboard_filter.R`. `test-dashboard.R`: 4 pasadas. No entra en `run_all.R` ni en `targets`.
+
+## 2026-11-17 — Online Retail II (`R/10_online_retail.R`)
+
+Fase B de la spec. No se modificó `EST_SPLIT_WEEKS` ni `run_all.R`. El xlsx de UCI queda en `data/raw/` y no se versiona. Tampoco entra en `targets`: sin el archivo, `tar_make()` dejaría de ser reproducible desde el clon.
+
+- 1,067,371 líneas, 2009-12-01 a 2011-12-09. Se tiran 243,007 sin `Customer ID`, las cantidades o precios no positivos y las facturas que empiezan por C. Una ocasión es un cliente-día: 36,969 facturas se agregan al día. Quedan 5,878 clientes identificados.
+- Cohorte: primera compra en las primeras 13 semanas. Son 1,729 clientes y 14,113 ocasiones dentro de las 78 semanas que se conservan (estimación 39, holdout hasta 2011-05-31). La serie cruda dura 105 semanas; el corte iguala el largo de CDNOW. CLVTools imprime un holdout de 38.857 semanas. El `H_weeks` del script, medido desde el día del corte hasta el último día incluido, es 39.
+- AIC y holdout eligen BG/NBD. MAE 2.026 frente a 2.041 del baseline: menos de un 1%. En CDNOW esa ventaja era ~26% (`10_vs_cdnow.csv`). El GGom/NBD tiene `b` = 0.006 y un logLik casi igual al Pareto/NBD.
+- Decil 1: predicho 0.723, observado 0.727. No se repite la subestimación de CDNOW. El decil superior concentra el 55.3% del CLV (CDNOW, 61.3%).
+- El minorista es estacional y el modelo no tiene calendario. El empate con el baseline es de este diseño, no una conclusión general.
