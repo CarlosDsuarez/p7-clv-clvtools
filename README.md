@@ -18,6 +18,7 @@ Rscript R/11_bnpl_merchants.R
 Rscript R/12_recovery_by_n.R
 Rscript R/13_identification.R
 Rscript R/14_seasonality.R
+Rscript R/15_ranking.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
@@ -39,6 +40,8 @@ Online Retail II no está en el repositorio. El script `R/10_online_retail.R` es
 `R/13_identification.R` alarga esa grilla a 10,000 y 20,000. El 14% no era un techo: con 20,000 comercios el error mediano de la tasa de abandono baja a 4.9%. `s` y `beta` se mueven juntos (correlación 0.98) y cada uno se estima peor que el cociente.
 
 `R/14_seasonality.R` compara cuatro semanas de diciembre con cuatro de junio en la cohorte de Online Retail. Diciembre está más activo (0.411 frente a 0.308 ocasiones). Aun así gana la tasa histórica en las dos ventanas, y repetir el diciembre anterior es el peor pronóstico (MAE 0.626): ese mes es la entrada del cliente, no una estación que se repite.
+
+`R/15_ranking.R` pregunta si, pese al empate en MAE, el modelo ordena mejor quién compra. No. En diciembre el Spearman es 0.451 para la tasa y 0.448 para el Pareto/NBD. En junio, 0.413 y 0.412. Entre repetidores la diferencia cabe en el tercer decimal.
 
 ## Resultados
 

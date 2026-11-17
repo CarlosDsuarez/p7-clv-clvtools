@@ -49,6 +49,7 @@ rec_n <- tab("12_recovery_by_n_summary.csv")
 rec_big <- tab("13_recovery_summary.csv")
 cor_sb <- tab("13_param_correlation.csv")
 seas <- tab("14_seasonality_mae.csv")
+rank_s <- tab("15_ranking.csv")
 rec <- tab("07_parameter_recovery.csv")
 cov <- tab("06_covariates_comparison.csv")
 clv <- tab("04_clv_pnbd_52w.csv")
@@ -351,6 +352,23 @@ kable(seas, digits = 3, caption = "MAE en dos ventanas de cuatro semanas.")
 
 La hipótesis no se sostiene. En diciembre el peor modelo es el estacional (MAE `r sprintf("%.3f", seas[window == "diciembre" & model == "seasonal", MAE])`), con sesgo positivo: el primer diciembre de la cohorte es cuando el cliente entra, y eso no se repite. En las dos ventanas gana la tasa histórica, y el BG/NBD queda un poco por encima (`r sprintf("%.3f", seas[window == "diciembre" & model == "bgnbd", MAE])` en diciembre y `r sprintf("%.3f", seas[window == "junio" & model == "bgnbd", MAE])` en junio). El empate del holdout largo no era solo Navidad.
 
+## Quién compra
+
+El MAE de cuatro semanas deja a la mayoría en cero: compra el `r sprintf("%.1f", 100 * rank_s[window == "diciembre" & model == "naive_rate", share_active])`% en diciembre y el `r sprintf("%.1f", 100 * rank_s[window == "junio" & model == "naive_rate", share_active])`% en junio. La hipótesis, fijada antes de mirar el resultado, era que ahí el Spearman del BG/NBD y del Pareto/NBD superaba al de la tasa histórica.
+
+```{r}
+#| echo: false
+rk <- copy(rank_s)
+rk[, spearman_all := round(spearman_all, 3)]
+rk[, spearman_repeat := round(spearman_repeat, 3)]
+kable(rk[, .(window, model, spearman_all, spearman_repeat)],
+      caption = "Spearman con el conteo observado. Repetidores: al menos dos compras en la estimación.")
+```
+
+![Orden de quién compra.](../outputs/figures/15_ranking.png)
+
+No se sostiene en la cohorte completa. En diciembre la tasa queda en `r sprintf("%.3f", rank_s[window == "diciembre" & model == "naive_rate", spearman_all])` y el Pareto/NBD en `r sprintf("%.3f", rank_s[window == "diciembre" & model == "pnbd", spearman_all])`. En junio, `r sprintf("%.3f", rank_s[window == "junio" & model == "naive_rate", spearman_all])` y `r sprintf("%.3f", rank_s[window == "junio" & model == "bgnbd", spearman_all])`. Entre quienes ya repitieron en la estimación la diferencia cambia de signo y sigue en el tercer decimal (`r sprintf("%.3f", rank_s[window == "diciembre" & model == "pnbd", spearman_repeat])` frente a `r sprintf("%.3f", rank_s[window == "diciembre" & model == "naive_rate", spearman_repeat])` en diciembre). El modelo no ordena mejor quién va a comprar en estas ventanas.
+
 ## Limitaciones
 
 - El contexto es sin contrato. Este marco no vale para suscripciones ni para préstamos, donde el abandono sí se observa.
@@ -378,6 +396,7 @@ Rscript R/11_bnpl_merchants.R
 Rscript R/12_recovery_by_n.R
 Rscript R/13_identification.R
 Rscript R/14_seasonality.R
+Rscript R/15_ranking.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'

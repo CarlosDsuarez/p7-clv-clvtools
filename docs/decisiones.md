@@ -191,3 +191,12 @@ Hipótesis escrita en el script antes de mirar el MAE: en las cuatro semanas del
 - La hipótesis no se sostiene. En diciembre el MAE es 0.413 (tasa), 0.436 (BG/NBD), 0.439 (Pareto/NBD) y 0.626 (estacional). El estacional sesga +0.38: el primer diciembre es la entrada a la cohorte.
 - En junio el orden es el mismo: tasa 0.371, BG/NBD 0.386, Pareto/NBD 0.390, estacional 0.390.
 - El empate del holdout largo con el baseline no se explica solo por Navidad. En las dos ventanas la tasa histórica queda por delante, por poco.
+
+## 2026-11-17 — Orden de quién compra (`R/15_ranking.R`)
+
+Hipótesis escrita antes de mirar el Spearman: en las mismas ventanas de `R/14_seasonality.R`, BG/NBD y Pareto/NBD superan a la tasa histórica. El MAE de cuatro semanas tiene muchos ceros (compra el 27.2% en diciembre y el 22.8% en junio), así que se mira el orden y no solo el error absoluto. No se cambia `EST_SPLIT_WEEKS`. No entra en `run_all.R` ni en `targets`.
+
+- Cohorte completa, diciembre: Spearman 0.451 (tasa), 0.448 (Pareto/NBD), 0.448 (BG/NBD), 0.358 (estacional).
+- Cohorte completa, junio: 0.413 (tasa), 0.412 (BG/NBD), 0.411 (Pareto/NBD), 0.321 (estacional).
+- Repetidores (al menos dos compras en la estimación), diciembre: Pareto/NBD 0.410 frente a tasa 0.408. Junio: BG/NBD 0.372 frente a tasa 0.368.
+- La hipótesis no se sostiene. El modelo no ordena mejor quién compra. La diferencia a favor de los repetidores cabe en el tercer decimal. El MAE de la fase 14 se reproduce en `mae_all`.
