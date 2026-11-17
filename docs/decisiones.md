@@ -98,4 +98,12 @@ s y beta se recuperan peor (débilmente identificados y correlacionados). Las me
 
 ## 2026-11-17 — Tests locales
 
-`testthat::test_dir("tests/testthat", stop_on_failure = TRUE)`: FAIL 0, PASS 20, WARN 1. El aviso es el de data.table compilado con R 4.6.1, no un fallo de aserción. El `stopifnot` de fuga temporal del paso 5 sigue en el script; el test de `features_at` cubre el mismo corte. El workflow de CI es el de la spec, sin cambios, hasta ver la primera corrida en GitHub Actions.
+`testthat::test_dir("tests/testthat", stop_on_failure = TRUE)`: FAIL 0, PASS 20, WARN 1. El aviso es el de data.table compilado con R 4.6.1, no un fallo de aserción. El `stopifnot` de fuga temporal del paso 5 sigue en el script; el test de `features_at` cubre el mismo corte.
+
+## 2026-11-17 — CI, clon limpio y reporte
+
+- GitHub Actions [run 44095269511](https://github.com/CarlosDsuarez/p7-clv-clvtools/actions/runs/44095269511): FAIL 0, WARN 0, PASS 20. El `ci.yml` de la spec no se modificó. Actions avisa que `checkout@v4` apunta a Node 20; el job igual terminó en verde.
+- A1: clon limpio del commit `8b1bf1e`, `renv::restore()` y `Rscript R/run_all.R` terminaron con código 0.
+- Para el reporte se añadieron a renv `knitr` 1.52 y `rmarkdown` 2.32. No entran en el ajuste de los modelos.
+- Quarto 1.11.9 produjo `reports/p7_clv.html`. El paquete de macOS pedía contraseña de administrador; se usó el tarball en el directorio del usuario. Quarto no es dependencia de `run_all.R`.
+- Las cifras del README y del html salen de `outputs/tables/*.csv`. El Spearman 0.165 se vuelve a calcular en el reporte con la misma fórmula del paso 4, porque el script solo lo imprime y no lo guarda en un CSV.
