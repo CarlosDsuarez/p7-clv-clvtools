@@ -1,0 +1,15 @@
+data/raw/
+outputs/models/
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# renv library (lockfile and activate.R stay tracked)
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/sandbox/
+renv/staging/
