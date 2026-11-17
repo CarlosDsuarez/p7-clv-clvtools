@@ -32,3 +32,16 @@ Los tres modelos convergieron. Cifras de `outputs/tables/02_model_comparison.csv
 - BG/NBD: logLik −9602.861, AIC 19213.72, BIC 19236.78. Gana por AIC.
 - Pareto/NBD: logLik −9615.242, AIC 19238.48, BIC 19261.54. Coeficientes: r 0.551, alpha 10.555, s 0.625, beta 12.244.
 - GGom/NBD: en la tabla impresa el logLik es el mismo que Pareto/NBD (−9615.242). En el CSV difieren en 1.3e-4 (−9615.24164 frente a −9615.24152). AIC 19240.48 solo sube por el parámetro extra. `coef()`: b = 1.92e-05, beta = 2.34e-04; r y alpha coinciden con Pareto/NBD. No es un modelo distinto: es el Pareto/NBD en el límite. No se cambió ningún parámetro.
+
+## 2026-11-17 — Corrida de `R/03_holdout_validation.R`
+
+Holdout de 38.7 semanas. Cifras de `outputs/tables/03_holdout_metrics.csv`. Coinciden con la referencia en la precisión publicada.
+
+- Pareto/NBD: MAE 0.751, RMSE 1.597, sesgo −0.099.
+- GGom/NBD: MAE 0.751, RMSE 1.597, sesgo −0.099 (empata con Pareto/NBD; el CSV difiere en el quinto decimal).
+- BG/NBD: MAE 0.782, RMSE 1.602, sesgo −0.101.
+- Baseline ingenuo: MAE 1.018, RMSE 2.199, sesgo +0.439.
+
+El MAE del Pareto/NBD es ~26% menor que el del baseline (0.751 frente a 1.018). El AIC de la fase 2 prefería BG/NBD; el MAE de este único holdout prefiere Pareto/NBD, con una diferencia de ~4% y sin intervalo. No se concluye más que eso.
+
+Calibración del Pareto/NBD (`03_calibration_pnbd_deciles.csv`): subestima en deciles bajos (decil 1: 0.108 predicho frente a 0.251 observado; decil 6: 0.164 frente a 0.343) y calibra bien arriba (decil 9: 1.308 frente a 1.254; decil 10: 3.865 frente a 3.737). La subestimación en baja actividad queda como hipótesis, no como resultado. El gráfico agregado está en `outputs/figures/03_tracking_pnbd.png`. Mismo aviso de `scale_x_date` que en la fase 1; el PNG se escribió.
