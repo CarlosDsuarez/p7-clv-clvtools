@@ -36,6 +36,9 @@ hor <- tab("04_sensitivity_horizon.csv")
 bench <- tab("05_benchmark.csv")
 roll <- tab("08_rolling_origin.csv")
 roll_sum <- tab("08_rolling_origin_summary.csv")
+cet_sum <- tab("09_cet_uncertainty_summary.csv")
+cet_dec <- tab("09_cet_coverage_by_decile.csv")
+clv_sum <- tab("09_clv_uncertainty_summary.csv")
 rec <- tab("07_parameter_recovery.csv")
 cov <- tab("06_covariates_comparison.csv")
 clv <- tab("04_clv_pnbd_52w.csv")
@@ -205,6 +208,22 @@ kable(roll_sum, digits = 3, caption = "Media y dispersión del MAE entre los cua
 
 El MAE medio del Pareto/NBD es `r sprintf("%.3f", roll_sum[model == "pnbd", MAE_mean])` (sd `r sprintf("%.3f", roll_sum[model == "pnbd", MAE_sd])`). El GGom/NBD da `r sprintf("%.3f", roll_sum[model == "ggomnbd", MAE_mean])`: sigue colapsando al mismo modelo (en los cortes de 26 y 64 el logLik coincide y $b$ es del orden de $10^{-6}$). BG/NBD queda en `r sprintf("%.3f", roll_sum[model == "bgnbd", MAE_mean])` y el baseline en `r sprintf("%.3f", roll_sum[model == "naive_rate", MAE_mean])`. En los cuatro cortes los BTYD baten al baseline y el Pareto/NBD queda por debajo de BG/NBD. Esa ventaja media es de unas cinco milésimas de MAE, menor que la dispersión entre cortes. El signo es estable. El tamaño de la ventaja no se separa del calendario.
 
+## Incertidumbre
+
+`predict(..., uncertainty = "boots", level = 0.9)` con 1,000 remuestreos devuelve un intervalo para la media de cada cliente, no para la compra que se va a observar. CLVTools avisa que con menos de 1,000 el percentil es poco estable; el default de la función es 100 y aquí no se usa.
+
+El CET puntual reproduce la calibración del holdout largo. El intervalo es estrecho: la mediana del ancho es `r sprintf("%.3f", cet_sum$median_width)` transacciones, un `r sprintf("%.0f", 100 * cet_sum$median_rel_width)`% de la predicción. La estimación puntual cae dentro de su intervalo en el `r sprintf("%.0f", 100 * cet_sum$pct_point_inside)`% de los clientes. El conteo real del holdout cae dentro en el `r sprintf("%.1f", 100 * cet_sum$coverage_of_counts)`%. En los siete deciles bajos la cobertura es cero.
+
+```{r}
+#| echo: false
+kable(cet_dec, digits = 3,
+      caption = "Cobertura del conteo real por el intervalo al 90% de la media.")
+```
+
+![Cobertura del conteo observado. La línea es el 90% de un intervalo de predicción, que esto no es.](../outputs/figures/09_cet_coverage_deciles.png)
+
+En el CLV a 52 semanas y 10% de descuento, la mediana del ancho es un `r sprintf("%.0f", 100 * clv_sum$median_rel_width)`% del valor puntual y el punto también cae siempre dentro. El total puntual es `r sprintf("%.0f", clv_sum$sum_clv)`, el mismo de la sensibilidad al 10%. Sumar los extremos de cada cliente da `r sprintf("%.0f", clv_sum$sum_ci_low)` y `r sprintf("%.0f", clv_sum$sum_ci_high)`. Eso no es un intervalo para el total: todos los clientes se mueven con el mismo sorteo de parámetros.
+
 ## Sensibilidad y concentración de valor
 
 `predicted.CLV` es DERT por gasto medio, con horizonte infinito. Por eso el total depende de la tasa de descuento y no de `prediction.end`. El horizonte solo mueve `CET` y `predicted.period.spending`. Medir la sensibilidad al horizonte con el CLV habría dado la misma cifra tres veces.
@@ -261,6 +280,7 @@ Desde la raíz del repositorio, con R ≥ 4.3:
 Rscript -e 'renv::restore()'
 Rscript R/run_all.R
 Rscript R/08_rolling_origin.R
+Rscript R/09_uncertainty.R
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
 quarto render reports/p7_clv.qmd
 ```

@@ -12,6 +12,7 @@ Hace falta R ≥ 4.3. CLVTools es GPL-3; si se compila desde fuente hace falta G
 Rscript -e 'renv::restore()'
 Rscript R/run_all.R
 Rscript R/08_rolling_origin.R
+Rscript R/09_uncertainty.R
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
 quarto render reports/p7_clv.qmd
 ```
@@ -33,6 +34,8 @@ Holdout de 38.7 semanas, 2,357 clientes (`outputs/tables/03_holdout_metrics.csv`
 Por AIC, en la ventana de estimación, gana BG/NBD (19,213.7 frente a 19,238.5 del Pareto/NBD). GGom/NBD empata el logLik del Pareto/NBD y no es un modelo distinto: `b` y `beta` caen al límite.
 
 Ese holdout es uno solo. Con horizonte fijo de 13 semanas y cortes en 26, 39, 52 y 64 (`outputs/tables/08_rolling_origin_summary.csv`), el MAE medio es 0.330 para Pareto/NBD y GGom/NBD (sd 0.044), 0.335 para BG/NBD y 0.398 para el baseline. El orden se repite en los cuatro cortes. La ventaja del Pareto/NBD sobre BG/NBD es de unas cinco milésimas, menor que la dispersión entre cortes. Estos MAE no se comparan con los de 38.7 semanas: el horizonte es otro, y el error absoluto baja porque la cohorte compra menos.
+
+Un intervalo bootstrap al 90% con 1,000 remuestreos (`09_cet_uncertainty_summary.csv`, `09_clv_uncertainty_summary.csv`) es un intervalo para la media, no para la próxima compra. La mediana del ancho del CET es el 32% de la predicción, y el conteo real del holdout cae dentro solo en el 2.3% de los clientes. En el CLV la mediana del ancho es el 87% del valor puntual. Sumar los extremos por cliente (178,039 a 439,766 alrededor de 317,281) no es un intervalo del total, porque los clientes comparten parámetros.
 
 El decil superior concentra el 61.3% del CLV. Ese CLV es de horizonte infinito (5% de descuento → 455,354; 10% → 317,281; 15% → 254,668; 20% → 217,210). El horizonte mueve el gasto del período, no el CLV: 13 semanas → 22,654; 26 → 42,309; 52 → 75,713; 104 → 128,544.
 

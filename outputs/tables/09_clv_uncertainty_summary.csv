@@ -1,0 +1,2 @@
+n_customers,num_boots,level,sum_clv,sum_ci_low,sum_ci_high,median_width,median_rel_width,pct_point_inside
+2357,1000,0.9,317281.218844197,178039.075711651,439766.13203839,24.2249125089707,0.869278911624542,1

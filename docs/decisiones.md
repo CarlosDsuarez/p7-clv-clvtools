@@ -118,3 +118,11 @@ Extensión de la sección 11 de la spec. No se modificó `EST_SPLIT_WEEKS` ni `R
 - En los cortes 26 y 64 el GGom tiene el mismo logLik que el Pareto/NBD y `b` del orden de 1e-6. Sigue siendo el mismo modelo.
 - En los cuatro cortes los BTYD baten al baseline y el Pareto/NBD queda por debajo de BG/NBD. La diferencia media de MAE entre esos dos es ~0.005, menor que la sd entre cortes. El signo es estable; el tamaño de la ventaja no.
 - El MAE absoluto cae del corte 26 (0.387) al 64 (0.286) para el Pareto/NBD porque la cohorte compra menos, no porque el modelo se vuelva más preciso en esa proporción.
+
+## 2026-11-17 — Incertidumbre (`R/09_uncertainty.R`)
+
+Extensión de la sección 11. No se modificó `EST_SPLIT_WEEKS` ni `run_all.R`.
+
+- `predict(..., uncertainty = "boots", level = 0.9)`. El default `num.boots = 100` dispara el aviso de CLVTools de que recomienda 1,000 o más. Se usan 1,000, con semilla 42 antes de cada llamada. El modelo es el Pareto/NBD reajustado en el script; el CET puntual reproduce los deciles de `03_calibration_pnbd_deciles.csv` y el CLV total al 10% reproduce `04_sensitivity_discount.csv` (317,281).
+- El intervalo es de la media (CET o CLV), no de la compra observada. Cobertura del conteo real del holdout: 2.3%. En los deciles 1 a 7 es 0. La estimación puntual cae dentro del intervalo en el 100% de los clientes. Mediana del ancho del CET: 0.047 transacciones, 32% de la predicción.
+- CLV: mediana del ancho 87% del valor puntual. La suma de los extremos inferiores es 178,039 y la de los superiores 439,766. No se presenta como intervalo del total: los clientes comparten el mismo sorteo de parámetros.
