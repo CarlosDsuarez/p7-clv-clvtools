@@ -126,3 +126,12 @@ Extensión de la sección 11. No se modificó `EST_SPLIT_WEEKS` ni `run_all.R`.
 - `predict(..., uncertainty = "boots", level = 0.9)`. El default `num.boots = 100` dispara el aviso de CLVTools de que recomienda 1,000 o más. Se usan 1,000, con semilla 42 antes de cada llamada. El modelo es el Pareto/NBD reajustado en el script; el CET puntual reproduce los deciles de `03_calibration_pnbd_deciles.csv` y el CLV total al 10% reproduce `04_sensitivity_discount.csv` (317,281).
 - El intervalo es de la media (CET o CLV), no de la compra observada. Cobertura del conteo real del holdout: 2.3%. En los deciles 1 a 7 es 0. La estimación puntual cae dentro del intervalo en el 100% de los clientes. Mediana del ancho del CET: 0.047 transacciones, 32% de la predicción.
 - CLV: mediana del ancho 87% del valor puntual. La suma de los extremos inferiores es 178,039 y la de los superiores 439,766. No se presenta como intervalo del total: los clientes comparten el mismo sorteo de parámetros.
+
+## 2026-11-17 — Pipeline con targets (`_targets.R`)
+
+Extensión de la sección 11. No se modificó la lógica de los scripts ni `EST_SPLIT_WEEKS`. `run_all.R` sigue corriendo solo los pasos 01–07.
+
+- `targets` 1.12.0. Cada target hace `source()` del script existente y declara los archivos que ese script ya escribía. La caché invalida un paso si cambia el script o un archivo del que depende (por ejemplo, el holdout depende del RDS de los ajustes).
+- `_targets/` no se versiona: es caché local. Los CSV y las figuras sí.
+- Primera `tar_make()`: 21 pasos, 5 min 57 s, 0 saltados. Los CSV no cambiaron respecto a la corrida anterior. Segunda `tar_make()`, sin tocar nada: 21 saltados, 44 ms.
+- Tres targets avisan lo ya conocido: data.table compilado con R 4.6.1 y `scale_x_date` en los gráficos de CLVTools. No se cambió el código por eso.

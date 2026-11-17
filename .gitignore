@@ -1,5 +1,6 @@
 data/raw/
 outputs/models/
+_targets/
 .Rproj.user
 .Rhistory
 .RData

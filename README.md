@@ -13,11 +13,14 @@ Rscript -e 'renv::restore()'
 Rscript R/run_all.R
 Rscript R/08_rolling_origin.R
 Rscript R/09_uncertainty.R
+Rscript -e 'targets::tar_make()'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
 quarto render reports/p7_clv.qmd
 ```
 
 Los parámetros viven en `R/00_utils.R` (semilla 42, unidad semanal, descuento anual 10%, corte a las 39 semanas). Un cambio se anota en `docs/decisiones.md`. `outputs/models/` no se versiona: `run_all.R` lo regenera.
+
+`targets::tar_make()` corre los mismos scripts y guarda la caché en `_targets/`, que no se sube a git. La primera vez tarda lo mismo que el pipeline; la siguiente, si nada cambió, no reajusta. `run_all.R` sigue siendo el camino sin esa capa.
 
 ## Resultados
 

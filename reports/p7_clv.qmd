@@ -62,7 +62,7 @@ gap_bg <- 100 * (mae_bg - mae_pnbd) / mae_pnbd
 xgb_vs_naive <- 100 * (1 - mae_xgb / bench[model == "naive", MAE])
 xgb_vs_pnbd <- 100 * (mae_xgb - mae_pnbd) / mae_pnbd
 
-key_pkgs <- c("CLVTools", "data.table", "ggplot2", "xgboost", "testthat", "knitr", "rmarkdown", "renv")
+key_pkgs <- c("CLVTools", "data.table", "ggplot2", "xgboost", "testthat", "knitr", "rmarkdown", "renv", "targets")
 pkg_ver <- data.table(
   package = key_pkgs,
   version = vapply(key_pkgs, function(p) as.character(packageVersion(p)), character(1))
@@ -281,9 +281,12 @@ Rscript -e 'renv::restore()'
 Rscript R/run_all.R
 Rscript R/08_rolling_origin.R
 Rscript R/09_uncertainty.R
+Rscript -e 'targets::tar_make()'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
 quarto render reports/p7_clv.qmd
 ```
+
+`targets::tar_make()` envuelve esos scripts sin reescribir los modelos. La caché queda en `_targets/` y no se versiona. La primera corrida de esta máquina tardó 5 min 57 s (21 pasos). La siguiente, sin cambios, se saltó los 21 en 44 ms. `run_all.R` sigue disponible sin esa capa.
 
 Esta corrida: `r R.version.string`.
 
