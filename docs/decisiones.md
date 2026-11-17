@@ -250,3 +250,13 @@ Hipótesis escrita antes de mirar el error: en la mitad alta de la fase 20, el e
 - CDNOW, mitad baja, quienes compran: 43 de 62. La tasa predice 5.61 y se observan 5.30 (exceso 0.30; con los 62 era 1.85). El BG/NBD baja a 3.36. En esta mitad los ceros sí cargan el exceso de la tasa, y el modelo se queda corto entre quienes vuelven.
 - Online Retail, mitad alta: vuelven 195 de 202. Tasa 14.84, BG/NBD 13.33, observado 13.29. El exceso de la tasa sigue en 1.55.
 - La fila de todos los recientes de CDNOW reproduce la fase 20: tasa 7.95, BG/NBD 4.77, observado 4.98.
+
+## 2026-11-17 — Ritmo entre compras (`R/22_purchase_pace.R`)
+
+Hipótesis escrita antes de mirar el intervalo: en la mitad alta, entre quienes compran al menos dos veces en el holdout, la mediana de (intervalo del holdout − intervalo de la estimación) es ≤ 0. El intervalo es el tiempo entre la primera y la última compra, dividido por las compras menos una. Un mismo día cuenta como 1/7 de semana. Mismos datos y la misma mediana que la fase 21. No entra en `run_all.R` ni en `targets`.
+
+- La hipótesis no se sostiene (`22_purchase_pace.csv`). CDNOW, mitad alta, 47 clientes: la mediana pasa de 3.17 a 3.81 semanas (diferencia 0.93). El 72% se vuelve más lento. La media del holdout sube a 5.33. La tasa predice 11.11 y se observan 8.15. El BG/NBD queda en 7.07 y el Pareto/NBD en 7.27.
+- CDNOW, mitad lenta, 34 clientes: la mediana pasa de 5.42 a 5.00 (diferencia −0.39). La tasa predice 5.57 y se observan 6.44. El BG/NBD queda en 3.54.
+- Seis clientes de la mitad rápida compran una sola vez (tasa 7.64, observado 1). El faltante grande está en los 47.
+- Online Retail, mitad rápida, 186 clientes: la mediana pasa de 3.10 a 3.26 (diferencia 0.35, 67% más lentos). Tasa 15.03, BG/NBD 13.47, observado 13.89.
+- Quienes vuelven en la mitad rápida de CDNOW reproducen la fase 21: 53 clientes, tasa 10.72, observado 7.34.
