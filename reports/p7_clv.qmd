@@ -48,6 +48,7 @@ bnpl_r <- tab("11_parameter_recovery.csv")
 rec_n <- tab("12_recovery_by_n_summary.csv")
 rec_big <- tab("13_recovery_summary.csv")
 cor_sb <- tab("13_param_correlation.csv")
+seas <- tab("14_seasonality_mae.csv")
 rec <- tab("07_parameter_recovery.csv")
 cov <- tab("06_covariates_comparison.csv")
 clv <- tab("04_clv_pnbd_52w.csv")
@@ -337,6 +338,19 @@ kable(cor_sb, digits = 3, caption = "Correlación, entre semillas, de las estima
 
 Con 20,000 comercios la mediana del error de \(E[\mu]\) es `r sprintf("%.1f", 100 * rec_big[n == 20000 & param == "E[mu]=s/beta", median_abs_rel_error])`%, y la de \(E[\lambda]\) es `r sprintf("%.1f", 100 * rec_big[n == 20000 & param == "E[lambda]=r/alpha", median_abs_rel_error])`%. No había un techo en 14%. \(s\) y \(\beta\) siguen peor identificados que su cociente (a 20,000, `r sprintf("%.1f", 100 * rec_big[n == 20000 & param == "s", median_abs_rel_error])`% y `r sprintf("%.1f", 100 * rec_big[n == 20000 & param == "beta", median_abs_rel_error])`%) y sus estimaciones se mueven juntas: la correlación entre semillas es `r sprintf("%.2f", cor_sb[n == 20000, cor_s_beta])`.
 
+## Estacionalidad
+
+La hipótesis, escrita antes de mirar el error, era esta: en las cuatro semanas de diciembre de 2010, repetir las cuatro semanas de diciembre de 2009 empata o gana a los BTYD; en las cuatro semanas de junio de 2011, los BTYD bajan el MAE de la tasa histórica. Misma cohorte y mismo corte de 39 semanas. Diciembre sí está más activo que junio: `r sprintf("%.3f", seas[window == "diciembre" & model == "naive_rate", mean_actual])` ocasiones de media frente a `r sprintf("%.3f", seas[window == "junio" & model == "naive_rate", mean_actual])`.
+
+```{r}
+#| echo: false
+kable(seas, digits = 3, caption = "MAE en dos ventanas de cuatro semanas.")
+```
+
+![Diciembre y junio, mismos modelos.](../outputs/figures/14_seasonality_mae.png)
+
+La hipótesis no se sostiene. En diciembre el peor modelo es el estacional (MAE `r sprintf("%.3f", seas[window == "diciembre" & model == "seasonal", MAE])`), con sesgo positivo: el primer diciembre de la cohorte es cuando el cliente entra, y eso no se repite. En las dos ventanas gana la tasa histórica, y el BG/NBD queda un poco por encima (`r sprintf("%.3f", seas[window == "diciembre" & model == "bgnbd", MAE])` en diciembre y `r sprintf("%.3f", seas[window == "junio" & model == "bgnbd", MAE])` en junio). El empate del holdout largo no era solo Navidad.
+
 ## Limitaciones
 
 - El contexto es sin contrato. Este marco no vale para suscripciones ni para préstamos, donde el abandono sí se observa.
@@ -363,6 +377,7 @@ Rscript R/10_online_retail.R
 Rscript R/11_bnpl_merchants.R
 Rscript R/12_recovery_by_n.R
 Rscript R/13_identification.R
+Rscript R/14_seasonality.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'

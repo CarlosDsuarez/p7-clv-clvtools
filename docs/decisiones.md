@@ -182,3 +182,12 @@ Grilla fijada antes de correrla: las mismas semillas 1 a 10, los tamaños de la 
 - \(E[\lambda]\) con 20,000: 1.9%.
 - En el mismo n = 20,000, \(s\) queda en 8.0% y \(\beta\) en 11.8%. El cociente se estima mejor que cada parámetro.
 - Correlación entre semillas de las estimaciones de \(s\) y \(\beta\): 0.98 con 20,000 comercios, y entre 0.92 y 1.00 en todos los tamaños (`13_param_correlation.csv`). Se mueven juntos.
+
+## 2026-11-17 — Estacionalidad en Online Retail (`R/14_seasonality.R`)
+
+Hipótesis escrita en el script antes de mirar el MAE: en las cuatro semanas del 2010-12-01 al 2010-12-29, repetir el mismo tramo de 2009 empata o gana a los BTYD; en las cuatro semanas del 2011-06-01 al 2011-06-29, los BTYD bajan el MAE de la tasa histórica. Misma cohorte de 13 semanas y el mismo `EST_SPLIT_WEEKS = 39`. El holdout guardado se alarga a 48 semanas para que junio de 2011 quepa. No entra en `run_all.R` ni en `targets`, porque el xlsx no está en el repo.
+
+- Diciembre tiene más actividad que junio: 0.411 frente a 0.308 ocasiones de media (`14_seasonality_mae.csv`).
+- La hipótesis no se sostiene. En diciembre el MAE es 0.413 (tasa), 0.436 (BG/NBD), 0.439 (Pareto/NBD) y 0.626 (estacional). El estacional sesga +0.38: el primer diciembre es la entrada a la cohorte.
+- En junio el orden es el mismo: tasa 0.371, BG/NBD 0.386, Pareto/NBD 0.390, estacional 0.390.
+- El empate del holdout largo con el baseline no se explica solo por Navidad. En las dos ventanas la tasa histórica queda por delante, por poco.

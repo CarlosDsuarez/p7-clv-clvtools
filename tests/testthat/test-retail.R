@@ -21,3 +21,14 @@ test_that("suma el día, tira devoluciones y recorta la cohorte", {
   expect_equal(out$tx$Price, 13)
   expect_equal(out$tx$Date, as.Date("2009-12-01"))
 })
+
+test_that("cuenta ocasiones dentro de una ventana semiabierta", {
+  tx <- data.table(
+    Id = c("a", "a", "b"),
+    Date = as.Date(c("2010-12-01", "2010-12-20", "2010-12-29")),
+    Price = c(1, 1, 1)
+  )
+  got <- count_between(tx, as.Date("2010-12-01"), as.Date("2010-12-29"))
+  expect_equal(got[Id == "a", y], 2)
+  expect_equal(nrow(got[Id == "b"]), 0)
+})

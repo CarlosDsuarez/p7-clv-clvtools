@@ -38,3 +38,7 @@ prepare_retail_transactions <- function(raw, first_weeks = 13, split_weeks = 39,
     n_cohort = uniqueN(keep)
   )
 }
+
+count_between <- function(tx, start, end) {
+  tx[Date >= start & Date < end, .(y = .N), by = Id]
+}
