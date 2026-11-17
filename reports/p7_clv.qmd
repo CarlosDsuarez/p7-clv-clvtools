@@ -50,6 +50,7 @@ rec_big <- tab("13_recovery_summary.csv")
 cor_sb <- tab("13_param_correlation.csv")
 seas <- tab("14_seasonality_mae.csv")
 rank_s <- tab("15_ranking.csv")
+hold_rank <- tab("16_holdout_rank.csv")
 rec <- tab("07_parameter_recovery.csv")
 cov <- tab("06_covariates_comparison.csv")
 clv <- tab("04_clv_pnbd_52w.csv")
@@ -369,6 +370,24 @@ kable(rk[, .(window, model, spearman_all, spearman_repeat)],
 
 No se sostiene en la cohorte completa. En diciembre la tasa queda en `r sprintf("%.3f", rank_s[window == "diciembre" & model == "naive_rate", spearman_all])` y el Pareto/NBD en `r sprintf("%.3f", rank_s[window == "diciembre" & model == "pnbd", spearman_all])`. En junio, `r sprintf("%.3f", rank_s[window == "junio" & model == "naive_rate", spearman_all])` y `r sprintf("%.3f", rank_s[window == "junio" & model == "bgnbd", spearman_all])`. Entre quienes ya repitieron en la estimación la diferencia cambia de signo y sigue en el tercer decimal (`r sprintf("%.3f", rank_s[window == "diciembre" & model == "pnbd", spearman_repeat])` frente a `r sprintf("%.3f", rank_s[window == "diciembre" & model == "naive_rate", spearman_repeat])` en diciembre). El modelo no ordena mejor quién va a comprar en estas ventanas.
 
+## Orden en el holdout largo
+
+Las cuatro semanas no separaron el orden. La hipótesis para el holdout de 39 semanas, la misma cohorte de la fase de Online Retail, era que el Spearman y la captura del decil superior del Pareto/NBD y del BG/NBD superaban a la tasa histórica.
+
+```{r}
+#| echo: false
+hr <- copy(hold_rank)
+hr[, spearman := round(spearman, 3)]
+hr[, `decil %` := round(100 * top_decile_share, 1)]
+hr[, MAE := round(MAE, 3)]
+kable(hr[, .(model, spearman, `decil %`, MAE)],
+      caption = "Holdout de 39 semanas. El decil es la parte de las compras futuras que cae en el 10% con mayor pronóstico.")
+```
+
+![Concentración de las compras futuras.](../outputs/figures/16_holdout_rank.png)
+
+Tampoco. El Spearman es `r sprintf("%.3f", hold_rank[model == "naive_rate", spearman])` para la tasa y `r sprintf("%.3f", hold_rank[model == "bgnbd", spearman])` para el BG/NBD. El decil superior se queda con el `r sprintf("%.1f", 100 * hold_rank[model == "naive_rate", top_decile_share])`% de las compras si se ordena por la tasa, y con el `r sprintf("%.1f", 100 * hold_rank[model == "bgnbd", top_decile_share])`% si se ordena por el BG/NBD. El MAE reproduce el de la fase anterior (2.026 frente a 2.041): la pequeña ventaja de error no trae un mejor orden.
+
 ## Limitaciones
 
 - El contexto es sin contrato. Este marco no vale para suscripciones ni para préstamos, donde el abandono sí se observa.
@@ -397,6 +416,7 @@ Rscript R/12_recovery_by_n.R
 Rscript R/13_identification.R
 Rscript R/14_seasonality.R
 Rscript R/15_ranking.R
+Rscript R/16_holdout_rank.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'

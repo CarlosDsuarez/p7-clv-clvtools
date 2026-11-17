@@ -19,6 +19,7 @@ Rscript R/12_recovery_by_n.R
 Rscript R/13_identification.R
 Rscript R/14_seasonality.R
 Rscript R/15_ranking.R
+Rscript R/16_holdout_rank.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
@@ -42,6 +43,8 @@ Online Retail II no está en el repositorio. El script `R/10_online_retail.R` es
 `R/14_seasonality.R` compara cuatro semanas de diciembre con cuatro de junio en la cohorte de Online Retail. Diciembre está más activo (0.411 frente a 0.308 ocasiones). Aun así gana la tasa histórica en las dos ventanas, y repetir el diciembre anterior es el peor pronóstico (MAE 0.626): ese mes es la entrada del cliente, no una estación que se repite.
 
 `R/15_ranking.R` pregunta si, pese al empate en MAE, el modelo ordena mejor quién compra. No. En diciembre el Spearman es 0.451 para la tasa y 0.448 para el Pareto/NBD. En junio, 0.413 y 0.412. Entre repetidores la diferencia cabe en el tercer decimal.
+
+`R/16_holdout_rank.R` repite esa pregunta en el holdout de 39 semanas. Tampoco. El Spearman es 0.655 para la tasa y 0.655 para el BG/NBD. El decil superior del pronóstico concentra el 38.2% de las compras futuras con la tasa y el 38.3% con el BG/NBD.
 
 ## Resultados
 

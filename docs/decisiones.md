@@ -200,3 +200,12 @@ Hipótesis escrita antes de mirar el Spearman: en las mismas ventanas de `R/14_s
 - Cohorte completa, junio: 0.413 (tasa), 0.412 (BG/NBD), 0.411 (Pareto/NBD), 0.321 (estacional).
 - Repetidores (al menos dos compras en la estimación), diciembre: Pareto/NBD 0.410 frente a tasa 0.408. Junio: BG/NBD 0.372 frente a tasa 0.368.
 - La hipótesis no se sostiene. El modelo no ordena mejor quién compra. La diferencia a favor de los repetidores cabe en el tercer decimal. El MAE de la fase 14 se reproduce en `mae_all`.
+
+## 2026-11-17 — Orden en el holdout de 39 semanas (`R/16_holdout_rank.R`)
+
+Hipótesis escrita antes de mirar el resultado: en la cohorte y el holdout de `R/10_online_retail.R`, el Spearman y la parte de compras futuras capturada por el decil superior del Pareto/NBD y del BG/NBD superan a la tasa histórica. No se cambia `EST_SPLIT_WEEKS`. No entra en `run_all.R` ni en `targets`.
+
+- Spearman (`16_holdout_rank.csv`): tasa 0.655, BG/NBD 0.655, GGom/NBD 0.652, Pareto/NBD 0.652.
+- Decil superior: tasa 38.2% de las compras del holdout; los tres BTYD, 38.3%.
+- El MAE reproduce la fase 10: BG/NBD 2.026, tasa 2.041, mismos 1,729 clientes.
+- La hipótesis no se sostiene. En este corte el modelo no ordena mejor a los clientes ni concentra mejor las compras futuras. La ventaja de MAE, de menos de un 1%, no viene de un mejor ranking.
