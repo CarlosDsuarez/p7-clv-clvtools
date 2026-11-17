@@ -241,3 +241,12 @@ Hipótesis escrita antes de mirar el error: entre los clientes con 6 o más comp
 - La hipótesis se sostiene en los dos datasets (`20_rate_shrinkage.csv`). La fila `recent_all` de CDNOW reproduce la fase 19: tasa 7.95, BG/NBD 4.77, observado 4.98, 124 clientes. La tasa por la P(activo) queda en 5.82.
 - CDNOW, mitad alta (62): tasa 10.37 (exceso 4.09), tasa por P(activo) 7.86, BG/NBD 6.38, Pareto/NBD 6.62, observado 6.27. Mitad baja (62): tasa 5.53 (exceso 1.85), tasa por P(activo) 3.79, BG/NBD 3.17, observado 3.68. En la baja, la P(activo) ya queda al lado de lo observado y el modelo sigue un poco más abajo.
 - Online Retail, mitad alta (202): P(activo) 0.997, así que la tasa pasa de 14.68 a 14.65 al multiplicarla. El BG/NBD baja a 13.20, con 12.83 observado (exceso de la tasa 1.85). Mitad baja (201): tasa 5.74, BG/NBD 5.68, observado 5.32 (exceso de la tasa 0.42).
+
+## 2026-11-17 — Quien vuelve (`R/21_active_holdout.R`)
+
+Hipótesis escrita antes de mirar el error: en la mitad alta de la fase 20, el exceso de `(n-1)/39` desaparece al dejar solo a quienes compran al menos una vez en el holdout. Ahí la media de la tasa queda por debajo o igual que lo observado, y el BG/NBD por debajo de la tasa. Mismos datos y la misma mediana. Mirar a quien vuelve es una descomposición, no un pronóstico. No entra en `run_all.R` ni en `targets`.
+
+- La hipótesis no se sostiene (`21_active_holdout.csv`). CDNOW, mitad alta, quienes compran: 53 de 62. La tasa predice 10.72 y se observan 7.34 (exceso 3.38; con los 62 era 4.09). El BG/NBD queda en 6.73 y el Pareto/NBD en 6.94. Quitar los 9 ceros deja la mayor parte del exceso.
+- CDNOW, mitad baja, quienes compran: 43 de 62. La tasa predice 5.61 y se observan 5.30 (exceso 0.30; con los 62 era 1.85). El BG/NBD baja a 3.36. En esta mitad los ceros sí cargan el exceso de la tasa, y el modelo se queda corto entre quienes vuelven.
+- Online Retail, mitad alta: vuelven 195 de 202. Tasa 14.84, BG/NBD 13.33, observado 13.29. El exceso de la tasa sigue en 1.55.
+- La fila de todos los recientes de CDNOW reproduce la fase 20: tasa 7.95, BG/NBD 4.77, observado 4.98.
