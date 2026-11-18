@@ -57,6 +57,7 @@ gap_mae <- tab("19_recency_gap.csv")
 shrink_mae <- tab("20_rate_shrinkage.csv")
 active_mae <- tab("21_active_holdout.csv")
 pace_mae <- tab("22_purchase_pace.csv")
+within_mae <- tab("23_within_pace.csv")
 rec <- tab("07_parameter_recovery.csv")
 cov <- tab("06_covariates_comparison.csv")
 clv <- tab("04_clv_pnbd_52w.csv")
@@ -541,6 +542,31 @@ En la mitad lenta la mediana no se alarga: de `r sprintf("%.2f", pace_mae[datase
 
 En el minorista la mitad rápida también alarga el intervalo, de `r sprintf("%.2f", pace_mae[dataset == "online_retail_ii" & cell == "recent_high" & slice == "pace", median_est_gap])` a `r sprintf("%.2f", pace_mae[dataset == "online_retail_ii" & cell == "recent_high" & slice == "pace", median_hold_gap])` semanas (`r sprintf("%.0f", 100 * pace_mae[dataset == "online_retail_ii" & cell == "recent_high" & slice == "pace", share_slower])`% más lentos). La tasa predice `r sprintf("%.2f", pace_mae[dataset == "online_retail_ii" & cell == "recent_high" & slice == "pace", mean_calendar])`, el BG/NBD `r sprintf("%.2f", pace_mae[dataset == "online_retail_ii" & cell == "recent_high" & slice == "pace", mean_bgnbd])` y se observan `r sprintf("%.2f", pace_mae[dataset == "online_retail_ii" & cell == "recent_high" & slice == "pace", mean_actual])`. Quienes vuelven en CDNOW, sin pedirles dos compras, reproducen el corte anterior: `r pace_mae[dataset == "cdnow" & cell == "recent_high" & slice == "return", n_customers]` clientes, tasa `r sprintf("%.2f", pace_mae[dataset == "cdnow" & cell == "recent_high" & slice == "return", mean_calendar])`, observado `r sprintf("%.2f", pace_mae[dataset == "cdnow" & cell == "recent_high" & slice == "return", mean_actual])`.
 
+## Antes del corte
+
+La hipótesis, fijada antes de mirar el intervalo, decía que esos clientes de la mitad rápida ya no se estaban frenando antes del corte. En la estimación, la mediana de (intervalo de la segunda mitad − intervalo de la primera), cliente por cliente, debía ser menor o igual que cero. Si el número de intervalos es impar, el del centro no entra.
+
+```{r}
+#| echo: false
+wn <- copy(within_mae[slice == "pace" & cell != "recent_all"])
+wn[, cell := factor(cell, levels = c("recent_low", "recent_high"))]
+setorder(wn, dataset, cell)
+wn[, median_early := round(median_early, 2)]
+wn[, median_late := round(median_late, 2)]
+wn[, median_diff := round(median_diff, 2)]
+wn[, share_slower := round(share_slower, 2)]
+kable(wn[, .(dataset, cell, n_customers, median_early, median_late, median_diff, share_slower)],
+      caption = "Al menos dos compras en el holdout. median_diff es el cambio, en semanas, de la primera mitad de la estimación a la segunda.")
+```
+
+![Ritmo en la primera y en la segunda mitad de la estimación.](../outputs/figures/23_within_pace.png)
+
+En CDNOW la hipótesis no se sostiene. En los `r within_mae[dataset == "cdnow" & cell == "recent_high" & slice == "pace", n_customers]` la mediana del cambio es `r sprintf("%.2f", within_mae[dataset == "cdnow" & cell == "recent_high" & slice == "pace", median_diff])` semanas: la primera mitad queda en `r sprintf("%.2f", within_mae[dataset == "cdnow" & cell == "recent_high" & slice == "pace", median_early])` y la segunda en `r sprintf("%.2f", within_mae[dataset == "cdnow" & cell == "recent_high" & slice == "pace", median_late])`. El `r sprintf("%.0f", 100 * within_mae[dataset == "cdnow" & cell == "recent_high" & slice == "pace", share_slower])`% se vuelve más lento. Los `r within_mae[dataset == "cdnow" & cell == "recent_high" & slice == "half", n_customers]` de la mitad rápida, sin pedirles dos compras después, tienen una mediana de `r sprintf("%.2f", within_mae[dataset == "cdnow" & cell == "recent_high" & slice == "half", median_diff])` y el `r sprintf("%.0f", 100 * within_mae[dataset == "cdnow" & cell == "recent_high" & slice == "half", share_slower])`% se vuelve más lento. Es el mismo grupo que el corte anterior: la tasa predice `r sprintf("%.2f", within_mae[dataset == "cdnow" & cell == "recent_high" & slice == "pace", mean_calendar])` y se observan `r sprintf("%.2f", within_mae[dataset == "cdnow" & cell == "recent_high" & slice == "pace", mean_actual])`.
+
+En la mitad lenta, los `r within_mae[dataset == "cdnow" & cell == "recent_low" & slice == "pace", n_customers]` tienen una mediana de `r sprintf("%.2f", within_mae[dataset == "cdnow" & cell == "recent_low" & slice == "pace", median_diff])` y el `r sprintf("%.0f", 100 * within_mae[dataset == "cdnow" & cell == "recent_low" & slice == "pace", share_slower])`% se vuelve más lento.
+
+En el minorista la hipótesis se sostiene en la mitad rápida. En `r within_mae[dataset == "online_retail_ii" & cell == "recent_high" & slice == "pace", n_customers]` clientes la mediana del cambio es `r sprintf("%.2f", within_mae[dataset == "online_retail_ii" & cell == "recent_high" & slice == "pace", median_diff])` semanas (`r sprintf("%.2f", within_mae[dataset == "online_retail_ii" & cell == "recent_high" & slice == "pace", median_early])` y `r sprintf("%.2f", within_mae[dataset == "online_retail_ii" & cell == "recent_high" & slice == "pace", median_late])`) y el `r sprintf("%.0f", 100 * within_mae[dataset == "online_retail_ii" & cell == "recent_high" & slice == "pace", share_slower])`% se vuelve más lento.
+
 ## Limitaciones
 
 - El contexto es sin contrato. Este marco no vale para suscripciones ni para préstamos, donde el abandono sí se observa.
@@ -576,6 +602,7 @@ Rscript R/19_recency_gap.R
 Rscript R/20_rate_shrinkage.R
 Rscript R/21_active_holdout.R
 Rscript R/22_purchase_pace.R
+Rscript R/23_within_pace.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'

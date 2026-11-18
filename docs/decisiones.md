@@ -260,3 +260,11 @@ Hipótesis escrita antes de mirar el intervalo: en la mitad alta, entre quienes 
 - Seis clientes de la mitad rápida compran una sola vez (tasa 7.64, observado 1). El faltante grande está en los 47.
 - Online Retail, mitad rápida, 186 clientes: la mediana pasa de 3.10 a 3.26 (diferencia 0.35, 67% más lentos). Tasa 15.03, BG/NBD 13.47, observado 13.89.
 - Quienes vuelven en la mitad rápida de CDNOW reproducen la fase 21: 53 clientes, tasa 10.72, observado 7.34.
+
+## 2026-11-18 — Ritmo antes del corte (`R/23_within_pace.R`)
+
+Hipótesis escrita antes de mirar el intervalo: en la mitad alta, entre quienes compran al menos dos veces en el holdout, la mediana de (intervalo de la segunda mitad de la estimación − intervalo de la primera) es ≤ 0. Si el número de intervalos es impar, el del centro no entra. Mismo grupo que la fase 22. No reajusta modelos. No entra en `run_all.R` ni en `targets`.
+
+- La hipótesis no se sostiene en CDNOW (`23_within_pace.csv`). Los 47 clientes reproducen la fase 22 (tasa 11.11, observado 8.15). La mediana del cambio es 0.45 semanas: primera mitad 2.14, segunda 3.14. El 64% se vuelve más lento. Los 62 de la mitad rápida, sin filtrar el holdout, tienen mediana 0.71 y el 71% se vuelve más lento.
+- CDNOW, mitad lenta, 34 clientes: mediana del cambio −0.10. El 50% se vuelve más lento.
+- En Online Retail la hipótesis se sostiene en la mitad rápida. 186 clientes, los mismos de la fase 22 (tasa 15.03, observado 13.89). Mediana del cambio −0.09 semanas (2.91 y 2.73). Se vuelve más lento el 47%.
