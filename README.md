@@ -27,6 +27,7 @@ Rscript R/20_rate_shrinkage.R
 Rscript R/21_active_holdout.R
 Rscript R/22_purchase_pace.R
 Rscript R/23_within_pace.R
+Rscript R/24_pace_continuation.R
 Rscript -e 'targets::tar_make()'
 Rscript -e 'shiny::runApp("shiny", launch.browser = TRUE)'
 Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
@@ -66,6 +67,8 @@ Online Retail II no está en el repositorio. El script `R/10_online_retail.R` es
 `R/22_purchase_pace.R` pregunta si, entre compra y compra, el ritmo se mantiene. En la mitad rápida de CDNOW, 47 clientes compran al menos dos veces y la mediana entre compras pasa de 3.17 a 3.81 semanas. El 72% se vuelve más lento. La tasa les predice 11.11 y compran 8.15. En la mitad lenta la mediana pasa de 5.42 a 5.00. En el minorista la mitad rápida pasa de 3.10 a 3.26 semanas, y el BG/NBD queda en 13.47 frente a 13.89 observadas.
 
 `R/23_within_pace.R` pregunta si ese frenazo ya estaba en la estimación. En CDNOW sí: en los mismos 47, la segunda mitad de las compras previas al corte es 0.45 semanas más lenta que la primera, y el 64% se frena. En el minorista no: la mediana del cambio es −0.09 semanas y se frena el 47%.
+
+`R/24_pace_continuation.R` pregunta si ese ritmo de la segunda mitad se mantiene en el holdout. No. En los mismos 47 de CDNOW la mediana del cambio es 1.21 semanas más, del 3.14 al 3.81, y el 70% se vuelve más lento. En el minorista, donde antes del corte no había frenazo, el holdout alarga 0.54 semanas, del 2.73 al 3.26.
 
 ## Resultados
 

@@ -268,3 +268,11 @@ Hipótesis escrita antes de mirar el intervalo: en la mitad alta, entre quienes 
 - La hipótesis no se sostiene en CDNOW (`23_within_pace.csv`). Los 47 clientes reproducen la fase 22 (tasa 11.11, observado 8.15). La mediana del cambio es 0.45 semanas: primera mitad 2.14, segunda 3.14. El 64% se vuelve más lento. Los 62 de la mitad rápida, sin filtrar el holdout, tienen mediana 0.71 y el 71% se vuelve más lento.
 - CDNOW, mitad lenta, 34 clientes: mediana del cambio −0.10. El 50% se vuelve más lento.
 - En Online Retail la hipótesis se sostiene en la mitad rápida. 186 clientes, los mismos de la fase 22 (tasa 15.03, observado 13.89). Mediana del cambio −0.09 semanas (2.91 y 2.73). Se vuelve más lento el 47%.
+
+## 2026-11-18 — Ritmo después del corte (`R/24_pace_continuation.R`)
+
+Hipótesis escrita antes de mirar la diferencia: en la mitad alta, entre quienes compran al menos dos veces en el holdout, la mediana de (intervalo del holdout − intervalo de la segunda mitad de la estimación) es ≤ 0. Mismas definiciones y el mismo grupo que las fases 22 y 23. No reajusta modelos. No entra en `run_all.R` ni en `targets`.
+
+- La hipótesis no se sostiene (`24_pace_continuation.csv`). CDNOW, 47 clientes: reproducen la tasa 11.11 y las 8.15 observadas. La mediana del cambio, cliente por cliente, es 1.21 semanas. Las medianas del grupo pasan de 3.14 a 3.81. El 70% se vuelve más lento. La media del holdout sube a 5.33.
+- CDNOW, mitad lenta, 34 clientes: la mediana del cambio es 1.45 semanas y el 62% se vuelve más lento. Las medianas del grupo quedan en 5.07 y 5.00.
+- Online Retail, mitad rápida, 186 clientes: la mediana del cambio es 0.54 semanas, de 2.73 a 3.26. El 66% se vuelve más lento. Ahí el frenazo aparece en el holdout.
