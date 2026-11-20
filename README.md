@@ -1,4 +1,8 @@
-# P7 · Customer Lifetime Value con CLVTools
+# BG/NBD
+
+BG es el abandono y NBD son las compras. El nombre es el de Fader, Hardie y Lee (2005). Mientras el cliente sigue activo, las compras llegan como un Poisson con tasa λ, y λ no es la misma para todos: se reparte con una gamma. Una Poisson mezclada con una gamma es una binomial negativa, y de ahí sale NBD. El abandono ocurre en la compra. Con probabilidad p esa compra es la última, y p tampoco es la misma para todos: se reparte con una beta. Con p fija, el número de compras hasta abandonar es geométrico; mezclado con la beta, es beta-geométrico. De ahí sale BG.
+
+En el Pareto/NBD el abandono puede llegar en cualquier momento, no solo en una compra. El BG/NBD lo deja pegado a la transacción. Su verosimilitud se escribe con funciones estándar; la del Pareto/NBD pide la hipergeométrica. En esta corrida el AIC de CDNOW elige al BG/NBD (19,213.7 frente a 19,238.5). El holdout, por poco, elige al Pareto/NBD (MAE 0.751 frente a 0.782). El nombre es el del modelo. El informe sigue comparando los tres.
 
 En un negocio sin contrato el abandono no se observa: solo se ve que el cliente dejó de comprar. Este proyecto estima, para cada cliente de CDNOW, cuántas compras hará en el holdout, si sigue activo y cuánto vale. Compara Pareto/NBD, BG/NBD y GGom/NBD contra un baseline ingenuo y contra un XGBoost con el mismo corte temporal. No es un tutorial: el criterio es el error fuera de tiempo, y el informe dice dónde el modelo falla.
 
